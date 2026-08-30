@@ -1,24 +1,25 @@
-name: Build Windows EXE
-
-on: [push]
-
-jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm install
-      - run: npm run build:win32
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: PabloPOS-Setup
-          path: dist/*.exe
-ch": [
+{
+  "name": "pablo-pos-app",
+  "version": "1.0.0",
+  "description": "Pablo Escobare POS Application",
+  "author": "Pablo",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win32": "electron-builder --win --ia32 --publish never"
+  },
+  "devDependencies": {
+    "electron": "22.3.27",
+    "electron-builder": "23.6.0"
+  },
+  "build": {
+    "appId": "com.pablo.pos",
+    "publish": null,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
             "ia32"
           ]
         }
@@ -26,8 +27,3 @@ ch": [
     }
   }
 }
-
-}
-}
-}
-
