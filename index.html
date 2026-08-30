@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pablo Escobare | لوحة تحكم الأدمن والمدير الذكية</title>
+  <style>
+    :root {
+      --bg-main: #050507;
+      --bg-surface: #0e0e12;
+      --bg-card: #14141c;
+      --bg-card-hover: #1b1b26;
+      --red-main: #ff1e38;
+      --red-glow: rgba(255, 30, 56, 0.45);
+      --gold-main: #f5c518;
+      --gold-glow: rgba(245, 197, 24, 0.35);
+      --green-main: hsla(0, 0%, 100%, 1);
+      --green-glow: rgba(0, 210, 180, 0.35);
+      --white-main: #ffffff;
+      --text-gray: #8f96a3;
+      
+      --border-light: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(255, 255, 255, 0.15);
+      --glass-bg: rgba(20, 20, 28, 0.45);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+      --transition-smooth: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+      --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
+    
+    body { 
+      background-color: var(--bg-main); 
+      color: var(--white-main); 
+      padding: 20px; 
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 15% 5%, rgba(255, 30, 56, 0.07), transparent 45%),
+        radial-gradient(circle at 85% 95%, rgba(245, 197, 24, 0.06), transparent 45%),
+        linear-gradient(180deg, rgba(5,5,7,0) 0%, rgba(14,14,18,0.4) 100%);
+      background-attachment: fixed;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--red-main); }
+
+    /* Header & Frame */
+    .pablo-police-frame {
+      position: relative;
+      background: rgba(20, 20, 28, 0.45); 
+      backdrop-filter: blur(24px) saturate(120%); 
+      -webkit-backdrop-filter: blur(24px) saturate(120%);
+      border-radius: 20px;
+      padding: 16px 28px;
+      margin-bottom: 24px;
+      z-index: 100; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-light); 
+      box-shadow: var(--glass-shadow);
+      overflow: hidden; 
+      position: sticky; top: 10px;
+    }
+
+    .pablo-police-frame::before,
+    .pablo-police-frame::after {
+      content: "";
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      z-index: -1;
+      filter: blur(55px);
+      border-radius: 50%;
+      opacity: 0.85;
+      transform: translate(-50%, -50%);
+    }
+
+    .pablo-police-frame::before { background: #ff0000; animation: swimRed 9s infinite ease-in-out alternate; }
+    .pablo-police-frame::after { background: #0011ff; animation: swimBlue 8s infinite ease-in-out alternate; }
+
+    @keyframes swimRed {
+      0%   { left: 10%; top: 20%; }
+      33%  { left: 50%; top: 90%; }
+      66%  { left: 80%; top: 10%; }
+      100% { left: 30%; top: 80%; }
+    }
+
+    @keyframes swimBlue {
+      0%   { left: 90%; top: 80%; }
+      33%  { left: 40%; top: 10%; }
+      66%  { left: 10%; top: 90%; }
+      100% { left: 70%; top: 20%; }
+    }
+
+    .logo { font-size: 1.6rem; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; }
+    .logo span { color: var(--red-main); text-shadow: 0 0 25px var(--red-glow); }
+
+    .admin-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    
+    .toggle-shop-btn { 
+      position: relative;
+      width: 150px;
+      height: 44px;
+      border-radius: 40px;
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      transition: all 0.4s ease;
+      overflow: hidden;
+      box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0,0,0,0.2); 
+      direction: rtl;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .toggle-shop-btn::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      transition: left 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background 0.4s, box-shadow 0.4s;
+      z-index: 2;
+    }
+
+    .btn-open {
+      background: rgba(0, 2, 210, 0.39);
+      border-color: rgba(0, 54, 210, 0.5);
+      color: var(--green-main);
+      padding-right: 16px;
+      padding-left: 42px;
+      justify-content: flex-start;
+    }
+    .btn-open::before {
+      left: 5px;
+      background: var(--green-main);
+      box-shadow: 0 0 15px var(--green-main); 
+    }
+
+    .btn-closed {
+      background: rgba(255, 30, 56, 0.12);
+      border-color: rgba(255, 30, 56, 0.5);
+      color: var(--red-main);
+      padding-left: 16px;
+      padding-right: 42px;
+      justify-content: flex-end;
+    }
+    .btn-closed::before {
+      left: calc(100% - 39px);
+      background: var(--red-main);
+      box-shadow: 0 0 15px var(--red-main);
+    }
+
+    .settings-gear { 
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-light);
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 0.9rem; 
+      font-weight: 700;
+      cursor: pointer; 
+      color: var(--text-gray); 
+      transition: var(--transition-smooth);
+      display: flex; align-items: center; gap: 8px;
+      white-space: nowrap;
+    }
+    .settings-gear:hover { color: #fff; border-color: var(--gold-main); background: rgba(245, 197, 24, 0.08); }
+
+    /* Dashboard Stats */
+    .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-light);
+      border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 8px;
+      box-shadow: var(--glass-shadow); transition: var(--transition-smooth);
+    }
+    .stat-card:hover { transform: translateY(-3px); border-color: var(--border-highlight); }
+    .stat-title { font-size: 0.85rem; color: var(--text-gray); font-weight: 700; }
+    .stat-value { font-size: 1.7rem; font-weight: 900; color: var(--white-main); }
+    .stat-value.gold { color: var(--gold-main); text-shadow: 0 0 15px var(--gold-glow); }
+    .stat-value.danger { color: var(--red-main); text-shadow: 0 0 15px var(--red-glow); }
+
+    /* Tabs */
+    .main-tabs { display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border-light); padding-bottom: 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tab-btn {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); color: var(--text-gray);
+      padding: 12px 20px; border-radius: 14px; font-weight: 800; cursor: pointer;
+      transition: var(--transition-smooth); font-size: 0.9rem; white-space: nowrap; flex-shrink: 0;
+    }
+    .tab-btn.active {
+      background: var(--red-main); color: #fff; border-color: var(--red-main);
+      box-shadow: 0 6px 20px var(--red-glow);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeUp 0.4s ease forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Layout Grids (Desktop & Mobile) */
+    .kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .pos-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
+    .expenses-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .kanban-column, .pos-menu-section, .pos-cart-section, .form-card, .table-card {
+      background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-light); 
+      border-radius: 20px; padding: 20px; box-shadow: var(--glass-shadow);
+    }
+
+    .column-header {
+      font-size: 1rem; font-weight: 800; padding-bottom: 12px; margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center;
+    }
+    .column-count { background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; color: #fff; border: 1px solid var(--border-light); font-weight: 800;}
+
+    /* Cards */
+    .orders-container, #expenses-list, #sales-list { display: flex; flex-direction: column; gap: 14px; max-height: 650px; overflow-y: auto; padding-right: 4px; }
+    .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; max-height: 550px; overflow-y: auto; }
+    
+    .order-card, .pos-item-card {
+      background: linear-gradient(160deg, rgba(26, 26, 36, 0.6) 0%, rgba(14, 14, 20, 0.8) 100%);
+      border: 1px solid var(--border-light); border-radius: 16px; padding: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2); transition: var(--transition-smooth); cursor: pointer;
+    }
+    .order-card:hover, .pos-item-card:hover { border-color: var(--border-highlight); transform: translateY(-3px); }
+
+    /* Inputs & Buttons */
+    .modal-input { 
+      width: 100%; padding: 12px 16px; margin-bottom: 14px; 
+      background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-light); 
+      color: #fff; border-radius: 12px; font-size: 0.9rem; outline: none;
+      transition: var(--transition-smooth);
+    }
+    .modal-input:focus { border-color: var(--gold-main); background: rgba(0, 0, 0, 0.6); }
+
+    .btn-action-primary, .btn-action-gold {
+      position: relative; overflow: hidden; border: none; padding: 12px; width: 100%; 
+      border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer;
+      transition: var(--transition-smooth); display: flex; justify-content: center; align-items: center;
+    }
+    .btn-action-primary { background: linear-gradient(135deg, #ff416c, var(--red-main)); color: #fff; box-shadow: 0 6px 20px var(--red-glow); }
+    .btn-action-gold { background: linear-gradient(135deg, var(--gold-main), #d49800); color: #000; box-shadow: 0 6px 20px var(--gold-glow); }
+
+    .pos-cats { display: flex; gap: 10px; margin-bottom: 16px; }
+    .pos-cat-btn, .sub-type-btn {
+      padding: 10px 14px; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-light);
+      color: var(--text-gray); font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: var(--transition-smooth); flex: 1; text-align: center;
+    }
+    .pos-cat-btn.active { background: rgba(245, 197, 24, 0.12); color: var(--gold-main); border-color: var(--gold-main); }
+    .sub-type-btn.active { background: rgba(255, 30, 56, 0.12); color: var(--red-main); border-color: var(--red-main); }
+
+    .kanban-action-btn {
+      padding: 6px 12px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 0.78rem; border: 1px solid;
+      transition: var(--transition-smooth);
+    }
+
+    .pack-selector-box {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border-light); border-radius: 12px; padding: 12px; margin-bottom: 14px;
+    }
+    .pack-item-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .pack-item-row:last-child { border-bottom: none; }
+    .pack-item-row input[type="checkbox"] { accent-color: var(--gold-main); width: 16px; height: 16px; cursor: pointer; }
+
+    .stock-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
+    .stock-ok { background: rgba(0, 210, 180, 0.15); color: var(--green-main); border: 1px solid rgba(0, 210, 180, 0.4); }
+    .stock-low { background: rgba(255, 30, 56, 0.15); color: var(--red-main); border: 1px solid rgba(255, 30, 56, 0.4); }
+
+    /* POS Cart Item Format */
+    .pos-cart-list { max-height: 350px; overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px; }
+    .pos-cart-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-light); }
+
+    /* Modals */
+    #settings-modal, #edit-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(12px);
+      z-index: 3000; justify-content: center; align-items: center; padding: 16px;
+    }
+    .modal-content {
+      background: var(--bg-surface); border: 1px solid var(--border-light); 
+      padding: 24px; border-radius: 20px; width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .btn-close-modal {
+      background: rgba(255,255,255,0.05); color: var(--text-gray); border: 1px solid var(--border-light); 
+      padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 16px;
+    }
+
+    /* Print */
+    #receipt-print-area { display: none; }
+    @media print {
+      body * { visibility: hidden; }
+      #receipt-print-area, #receipt-print-area * { visibility: visible; }
+      #receipt-print-area {
+        display: block !important; position: absolute; left: 0; top: 0; width: 80mm; padding: 10px;
+        color: #000; background: #fff; font-family: monospace; font-size: 11px; text-align: right; direction: rtl;
+      }
+      #receipt-print-area h2 { font-size: 15px; text-align: center; margin-bottom: 4px; }
+      #receipt-print-area p { text-align: center; margin-bottom: 6px; font-size: 10px; }
+      #receipt-print-area table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+      #receipt-print-area th, #receipt-print-area td { text-align: right; padding: 4px 0; font-size: 10px; border-bottom: 1px dotted #ccc; }
+      #receipt-print-area td.num { text-align: left; }
+      .receipt-divider { border-top: 1px dashed #000; margin: 8px 0; }
+      .receipt-total { display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 6px; }
+    }
+
+    /* 📱 Responsive Queries for Mobile */
+    @media (max-width: 950px) {
+      .kanban-board, .expenses-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .pos-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 650px) {
+      body { padding: 12px; }
+      .pablo-police-frame {
+        flex-direction: column;
+        gap: 14px;
+        padding: 16px;
+        text-align: center;
+      }
+      .admin-bar {
+        width: 100%;
+        justify-content: center;
+      }
+      .logo { font-size: 1.3rem; }
+      .pos-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .dashboard-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="main-container">
+
+  <!-- Header -->
+  <header class="pablo-police-frame">
+    <div class="logo">PABLO <span>ESCOBARE</span></div>
+    <div class="admin-bar">
+      <button id="shop-toggle-btn" class="toggle-shop-btn btn-open" onclick="toggleShopStatus()">المحل مفتوح</button>
+      <span class="settings-gear" onclick="openSettingsModal()" title="إدارة القائمة والخدمات">⚙️ إعدادات القائمة</span>
+    </div>
+  </header>
+
+  <!-- Dashboard Stats -->
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <span class="stat-title">طلبات اليوم المقبولة</span>
+      <span class="stat-value" id="stat-count">0</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-title">إجمالي المداخيل اليومية</span>
+      <span class="stat-value gold" id="stat-revenue">0 د.ج</span>
+    </div>
+    <div class="stat-card" style="border-right: 4px solid var(--red-main);">
+      <span class="stat-title">إجمالي مصاريف السلع المسجلة</span>
+      <span class="stat-value danger" id="stat-expenses">0 د.ج</span>
+    </div>
+  </div>
+
+  <!-- Main Tabs -->
+  <div class="main-tabs">
+    <button class="tab-btn active" onclick="switchAdminTab('kanban-tab', this)">📋 إدارة وتتبع الطلبات</button>
+    <button class="tab-btn" onclick="switchAdminTab('pos-tab', this)">🛒 طلب حضوري (POS)</button>
+    <button class="tab-btn" onclick="switchAdminTab('expenses-tab', this)">📦 المخزن والمصاريف</button>
+  </div>
+
+  <!-- TAB 1: Kanban Board -->
+  <div id="kanban-tab" class="tab-content active">
+    <div class="kanban-board">
+      <div class="kanban-column" style="border-top: 4px solid var(--gold-main);">
+        <div class="column-header">
+          <span>⏳ قيد الانتظار</span>
+          <span class="column-count" id="count-pending">0</span>
+        </div>
+        <div class="orders-container" id="orders-pending"></div>
+      </div>
+
+      <div class="kanban-column" style="border-top: 4px solid var(--green-main);">
+        <div class="column-header">
+          <span>👨‍🍳 قيد التحضير</span>
+          <span class="column-count" id="count-cooking">0</span>
+        </div>
+        <div class="orders-container" id="orders-cooking"></div>
+      </div>
+
+      <div class="kanban-column" style="border-top: 4px solid var(--red-main);">
+        <div class="column-header">
+          <span>🛵 في الطريق / التوصيل</span>
+          <span class="column-count" id="count-delivery">0</span>
+        </div>
+        <div class="orders-container" id="orders-delivery"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: POS System -->
+  <div id="pos-tab" class="tab-content">
+    <div class="pos-layout">
+      <div class="pos-menu-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+          <h3 style="font-size: 1.1rem; color: var(--gold-main);">قائمة الطعام (اختيار سريع)</h3>
+          <input type="text" id="pos-search-input" class="modal-input" placeholder="🔍 ابحث عن صنف..." style="width: 180px; margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem;" oninput="renderPosGrid()">
+        </div>
+        <div class="pos-cats">
+          <button class="pos-cat-btn active" onclick="filterPosCat('food', this)">وجبات 🍔</button>
+          <button class="pos-cat-btn" onclick="filterPosCat('drink', this)">مشروبات 🥤</button>
+          <button class="pos-cat-btn" onclick="filterPosCat('pack', this)">Packs 🔥</button>
+        </div>
+        <div class="pos-grid" id="pos-grid"></div>
+      </div>
+
+      <div class="pos-cart-section">
+        <div>
+          <h3 style="font-size: 1.05rem; color: #fff; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">🧾 الطلب الحالي (حضوري)</h3>
+          <div class="pos-cart-list" id="pos-cart-list">
+            <div style="text-align:center; color:var(--text-gray); padding: 30px 0;">السلة فارغة</div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size: 1.2rem; font-weight: 900; margin-bottom: 14px; background: var(--bg-main); padding: 12px; border-radius: 12px; border: 1px solid var(--border-light);">
+            <span>المجموع:</span>
+            <span style="color:var(--gold-main);" id="pos-total">0 د.ج</span>
+          </div>
+          <button onclick="confirmAndPrintPos()" class="btn-action-gold">تأكيد وطباعة الوصل 🖨️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Inventory & Expenses -->
+  <div id="expenses-tab" class="tab-content">
+    <div class="expenses-layout">
+      <div>
+        <div class="form-card">
+          <h3 style="margin-bottom: 14px; color: var(--red-main); font-size: 1.1rem;">+ إدخال شراء جديدة</h3>
+          
+          <div style="display:flex; gap:10px; margin-bottom:14px;">
+            <button id="btn-exp-drink" type="button" class="sub-type-btn active" onclick="switchExpenseType('drink')">🥤 مشروبات</button>
+            <button id="btn-exp-general" type="button" class="sub-type-btn" onclick="switchExpenseType('general')">📦 سلعة عامة</button>
+          </div>
+
+          <div id="form-exp-drink">
+            <label style="font-size:0.8rem; color:var(--text-gray); display:block; margin-bottom:6px;">اختر المشروب المراد تزويده:</label>
+            <select id="expense-drink-select" class="modal-input"></select>
+            <input type="number" id="expense-drink-qty" class="modal-input" placeholder="الكمية المشتراة (عدد القطع)">
+            <input type="number" id="expense-drink-unit-price" class="modal-input" placeholder="ثمن الشراء للوحدة الواحدة (د.ج)">
+          </div>
+
+          <div id="form-exp-general" style="display:none;">
+            <input type="text" id="expense-gen-name" class="modal-input" placeholder="اسم الشيء (مثال: بطاطس، زيت، لحم...)">
+            <input type="number" id="expense-gen-price" class="modal-input" placeholder="ثمن الشراء الإجمالي (د.ج)">
+          </div>
+          
+          <button onclick="addExpenseItem()" class="btn-action-primary" style="margin-top:4px;">إرسال للأرشيف والمصاريف</button>
+        </div>
+
+        <div class="table-card" style="margin-top: 20px;">
+          <h3 style="margin-bottom: 14px; color: var(--gold-main); font-size: 1.05rem;">🥤 مخزون المشروبات المتبقية</h3>
+          <div id="stock-list" style="display:flex; flex-direction:column; gap:10px; max-height: 320px; overflow-y: auto;">
+            <div style="text-align:center; color:var(--text-gray); padding:15px;">جاري تحميل مخزون المشروبات...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <button id="btn-archive-purchases" class="sub-type-btn active" onclick="switchArchiveTab('purchases')">📦 أرشيف المشتريات</button>
+          <button id="btn-archive-sales" class="sub-type-btn" onclick="switchArchiveTab('sales')">💰 أرشيف المبيعات</button>
+        </div>
+
+        <div id="archive-purchases-section">
+          <div id="expenses-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 600px; overflow-y: auto;">
+            <div style="text-align:center; color:var(--text-gray); padding:20px;">جاري تحميل المشتريات...</div>
+          </div>
+        </div>
+
+        <div id="archive-sales-section" style="display: none;">
+          <div id="sales-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 600px; overflow-y: auto;">
+            <div style="text-align:center; color:var(--text-gray); padding:20px;">جاري تحميل المبيعات...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 18px; color:var(--red-main); font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+        ⚙️ إدارة خدمات القائمة والمخزون الأولي
+      </h3>
+      <div style="background:var(--bg-card); padding:18px; border-radius:14px; margin-bottom:20px; border:1px solid var(--border-light);">
+        <h4 style="margin-bottom:12px; font-size:0.95rem; color:var(--gold-main);">+ إضافة عنصر جديد للقائمة</h4>
+        <input type="text" id="new-name" class="modal-input" placeholder="اسم العنصر أو اسم الـ Pack">
+        <input type="number" id="new-price" class="modal-input" placeholder="سعر البيع للزبون (د.ج)">
+        <input type="number" id="new-cost" class="modal-input" placeholder="ثمن الشراء للوحدة (خاص بالمشروبات) (د.ج)" value="0">
+        <input type="number" id="new-stock" class="modal-input" placeholder="الكمية الابتدائية (خاص بالمشروبات)" value="0">
+        
+        <select id="new-type" class="modal-input" onchange="toggleNewPackSelector()">
+          <option value="food">وجبة عادية</option>
+          <option value="drink">مشروب 🥤</option>
+          <option value="pack">Pack مميز 🔥</option>
+        </select>
+
+        <div id="new-pack-container" style="display:none; margin-bottom:14px;">
+          <label style="font-size:0.8rem; color:var(--gold-main); display:block; margin-bottom:6px;">اختر المكونات وحدد الكميات:</label>
+          <div id="new-pack-items-list" class="pack-selector-box"></div>
+        </div>
+
+        <button onclick="addNewItem()" class="btn-action-primary">إضافة للقائمة</button>
+      </div>
+
+      <h4 style="margin-bottom:10px; font-size:0.9rem; color:var(--text-gray);">الخدمات الحالية:</h4>
+      <div id="admin-menu-list"></div>
+      <button onclick="closeSettingsModal()" class="btn-close-modal">إغلاق</button>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="edit-modal">
+    <div class="modal-content" style="max-width: 480px;">
+      <h3 style="margin-bottom: 18px; color:var(--gold-main); font-size: 1.2rem;">✏️ تعديل العنصر</h3>
+      <input type="hidden" id="edit-id">
+      <input type="text" id="edit-name" class="modal-input" placeholder="اسم العنصر">
+      <input type="number" id="edit-price" class="modal-input" placeholder="سعر البيع (د.ج)">
+      <input type="number" id="edit-cost" class="modal-input" placeholder="ثمن الشراء للوحدة (د.ج)">
+      <input type="number" id="edit-stock" class="modal-input" placeholder="الكمية بالمخزون (للمشروبات)">
+      
+      <select id="edit-type" class="modal-input" onchange="toggleEditPackSelector()">
+        <option value="food">وجبة عادية</option>
+        <option value="drink">مشروب 🥤</option>
+        <option value="pack">Pack مميز 🔥</option>
+      </select>
+
+      <div id="edit-pack-container" style="display:none; margin-bottom:14px;">
+        <label style="font-size:0.8rem; color:var(--gold-main); display:block; margin-bottom:6px;">اختر المكونات وحدد الكميات:</label>
+        <div id="edit-pack-items-list" class="pack-selector-box"></div>
+      </div>
+
+      <button onclick="saveEditedItem()" class="btn-action-primary" style="margin-top: 8px;">حفظ التعديلات</button>
+      <button onclick="closeEditModal()" class="btn-close-modal">إلغاء</button>
+    </div>
+  </div>
+
+  <!-- Receipt Print Template -->
+  <div id="receipt-print-area">
+    <h2>PABLO ESCOBARE</h2>
+    <p>مطعم وتوصيل وجبات سريعة</p>
+    <div class="receipt-divider"></div>
+    <div style="font-size:10px;" id="receipt-time"></div>
+    <div style="font-size:10px;">النوع: طلب محلي (حضوري)</div>
+    <div class="receipt-divider"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>الصنف</th>
+          <th class="num">السعر</th>
+        </tr>
+      </thead>
+      <tbody id="receipt-items-body"></tbody>
+    </table>
+    <div class="receipt-divider"></div>
+    <div class="receipt-total">
+      <span>المجموع الإجمالي:</span>
+      <span id="receipt-total-val"></span>
+    </div>
+    <div class="receipt-divider"></div>
+    <p style="margin-top:8px;">شكراً لزيارتكم ونتمنى لكم شهية طيبة! 🍔</p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, setDoc, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBVyedQY7ghVfVWTFVgMtx7KFTKz-8bepQ",
+      authDomain: "pablo-7372e.firebaseapp.com",
+      projectId: "pablo-7372e",
+      storageBucket: "pablo-7372e.firebasestorage.app",
+      messagingSenderId: "395777904599",
+      appId: "1:395777904599:web:a1e3a4ce578ca31c2cc592"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let isShopOpen = true;
+    let previousOrdersCount = null;
+    let menuItems = [];
+    let activeOrdersMap = new Map();
+    let posCart = [];
+    let currentPosCat = 'food';
+    let currentExpenseType = 'drink';
+    let currentArchiveTab = 'purchases';
+
+    window.switchAdminTab = function(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    };
+
+    window.switchArchiveTab = function(tab) {
+      currentArchiveTab = tab;
+      const btnPurchases = document.getElementById('btn-archive-purchases');
+      const btnSales = document.getElementById('btn-archive-sales');
+      const sectionPurchases = document.getElementById('archive-purchases-section');
+      const sectionSales = document.getElementById('archive-sales-section');
+
+      if (tab === 'purchases') {
+        btnPurchases.classList.add('active');
+        btnSales.classList.remove('active');
+        sectionPurchases.style.display = 'block';
+        sectionSales.style.display = 'none';
+      } else {
+        btnSales.classList.add('active');
+        btnPurchases.classList.remove('active');
+        sectionSales.style.display = 'block';
+        sectionPurchases.style.display = 'none';
+      }
+    };
+
+    function playNotificationSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine'; 
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+      } catch(e) {}
+    }
+
+    onSnapshot(doc(db, "settings", "shop"), (docSnap) => {
+      if(docSnap.exists()) {
+        isShopOpen = docSnap.data().isOpen;
+        const btn = document.getElementById('shop-toggle-btn');
+        btn.innerText = isShopOpen ? "المحل مفتوح" : "المحل مغلق";
+        btn.className = isShopOpen ? "toggle-shop-btn btn-open" : "toggle-shop-btn btn-closed";
+      }
+    });
+
+    window.toggleShopStatus = async function() {
+      await setDoc(doc(db, "settings", "shop"), { isOpen: !isShopOpen });
+    };
+
+    onSnapshot(collection(db, "menu"), (snapshot) => {
+      menuItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAdminMenuList(menuItems);
+      renderPosGrid();
+      populateExpenseDrinkDropdown();
+      renderStockList();
+      renderNewPackCheckboxes();
+      renderEditPackCheckboxes();
+    });
+
+    window.formatSubItems = function(subItems) {
+      if (!subItems || !Array.isArray(subItems)) return '';
+      return subItems.map(si => {
+        if (typeof si === 'object' && si !== null) {
+          return `${si.qty}x ${si.name}`;
+        }
+        return si;
+      }).join(' + ');
+    };
+
+    window.togglePackQtyInput = function(checkbox) {
+      const qtyInput = checkbox.closest('.pack-item-row').querySelector('input[type="number"]');
+      if (checkbox.checked) {
+        qtyInput.style.display = 'block';
+      } else {
+        qtyInput.style.display = 'none';
+      }
+    };
+
+    window.renderNewPackCheckboxes = function(selectedItems = []) {
+      const container = document.getElementById('new-pack-items-list');
+      if (!container) return;
+      const nonPackItems = menuItems.filter(i => i.type !== 'pack');
+      if (nonPackItems.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-gray); font-size:0.8rem; text-align:center;">لا توجد وجبات أو مشروبات مسجلة بعد.</div>`;
+        return;
+      }
+      container.innerHTML = nonPackItems.map(item => {
+        const found = selectedItems.find(si => (typeof si === 'object' ? si.name === item.name : si.includes(item.name)));
+        const isChecked = !!found;
+        const qty = found ? (typeof found === 'object' ? found.qty : (parseInt(found) || 1)) : 1;
+        return `
+          <div class="pack-item-row">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; flex: 1;">
+              <input type="checkbox" name="newPackItemCheckbox" value="${item.name}" ${isChecked ? 'checked' : ''} onchange="togglePackQtyInput(this)">
+              <span>${item.name} (${item.type === 'drink' ? 'مشروب' : 'وجبة'})</span>
+            </label>
+            <input type="number" name="newPackItemQty" value="${qty}" min="1" class="modal-input" style="width: 65px; margin-bottom: 0; padding: 4px 6px; font-size: 0.82rem; text-align: center; ${isChecked ? '' : 'display:none;'}" placeholder="الكمية">
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.renderEditPackCheckboxes = function(selectedItems = []) {
+      const container = document.getElementById('edit-pack-items-list');
+      if (!container) return;
+      const nonPackItems = menuItems.filter(i => i.type !== 'pack');
+      if (nonPackItems.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-gray); font-size:0.8rem; text-align:center;">لا توجد وجبات أو مشروبات مسجلة بعد.</div>`;
+        return;
+      }
+      container.innerHTML = nonPackItems.map(item => {
+        const found = selectedItems.find(si => (typeof si === 'object' ? si.name === item.name : si.includes(item.name)));
+        const isChecked = !!found;
+        const qty = found ? (typeof found === 'object' ? found.qty : (parseInt(found) || 1)) : 1;
+        return `
+          <div class="pack-item-row">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; flex: 1;">
+              <input type="checkbox" name="editPackItemCheckbox" value="${item.name}" ${isChecked ? 'checked' : ''} onchange="togglePackQtyInput(this)">
+              <span>${item.name} (${item.type === 'drink' ? 'مشروب' : 'وجبة'})</span>
+            </label>
+            <input type="number" name="editPackItemQty" value="${qty}" min="1" class="modal-input" style="width: 65px; margin-bottom: 0; padding: 4px 6px; font-size: 0.82rem; text-align: center; ${isChecked ? '' : 'display:none;'}" placeholder="الكمية">
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.toggleNewPackSelector = function() {
+      const type = document.getElementById('new-type').value;
+      const container = document.getElementById('new-pack-container');
+      container.style.display = (type === 'pack') ? 'block' : 'none';
+      if (type === 'pack') renderNewPackCheckboxes();
+    };
+
+    window.toggleEditPackSelector = function() {
+      const type = document.getElementById('edit-type').value;
+      const container = document.getElementById('edit-pack-container');
+      container.style.display = (type === 'pack') ? 'block' : 'none';
+    };
+
+    function populateExpenseDrinkDropdown() {
+      const select = document.getElementById('expense-drink-select');
+      if(!select) return;
+      const drinks = menuItems.filter(i => i.type === 'drink');
+      if(drinks.length === 0) {
+        select.innerHTML = `<option value="">-- لا توجد مشروبات مسجلة --</option>`;
+        return;
+      }
+      select.innerHTML = drinks.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+    }
+
+    function renderStockList() {
+      const container = document.getElementById('stock-list');
+      if(!container) return;
+      const drinks = menuItems.filter(item => item.type === 'drink');
+
+      if(drinks.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--text-gray); padding:15px;">لا توجد مشروبات في المخزون.</div>`;
+        return;
+      }
+
+      container.innerHTML = drinks.map(item => {
+        const stockQty = item.stock !== undefined ? Number(item.stock) : 0;
+        const isLow = stockQty <= 5;
+        const unitCost = item.costPrice !== undefined ? Number(item.costPrice) : 0;
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); padding:10px 14px; border-radius:12px; border:1px solid var(--border-light);">
+            <div>
+              <strong style="color:#fff; font-size:0.9rem;">${item.name}</strong>
+              <div style="font-size:0.75rem; color:var(--text-gray); margin-top:2px;">🥤 سعر الشراء: <span style="color:var(--gold-main);">${unitCost} د.ج</span></div>
+            </div>
+            <div>
+              <span class="stock-badge ${isLow ? 'stock-low' : 'stock-ok'}">
+                ${stockQty} قطعة ${isLow ? '⚠️' : '✅'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAdminMenuList(items) {
+      const container = document.getElementById('admin-menu-list');
+      if(items.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-gray); font-size:0.85rem; text-align:center; padding:15px;">لا توجد عناصر.</div>`;
+        return;
+      }
+      container.innerHTML = items.map(item => {
+        const stockQty = item.stock !== undefined ? item.stock : 0;
+        const costPrice = item.costPrice !== undefined ? item.costPrice : 0;
+        const subItemsStr = (item.type === 'pack' && item.subItems && item.subItems.length > 0) 
+          ? `<div style="font-size:0.75rem; color:var(--gold-main); margin-top:3px;">المكونات: ${formatSubItems(item.subItems)}</div>` 
+          : '';
+
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); padding:10px 14px; border-radius:12px; margin-bottom:8px; border:1px solid var(--border-light);">
+            <div>
+              <strong style="color:#fff; font-size:0.9rem;">${item.name}</strong>
+              <div style="font-size:0.78rem; color:var(--text-gray); margin-top:2px;">
+                بيع: <span style="color:var(--gold-main);">${item.price} د.ج</span> 
+                ${item.type === 'drink' ? `| شراء: ${costPrice} د.ج | المخزون: ${stockQty}` : ''}
+              </div>
+              ${subItemsStr}
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button onclick="openEditModal('${item.id}')" style="background:rgba(245, 197, 24, 0.12); color:var(--gold-main); border:1px solid rgba(245,197,24,0.3); padding:4px 10px; border-radius:8px; cursor:pointer; font-weight:700; font-size:0.75rem;">تعديل</button>
+              <button onclick="deleteMenuItem('${item.id}')" style="background:rgba(255, 30, 56, 0.12); color:var(--red-main); border:1px solid rgba(255,30,56,0.3); padding:4px 10px; border-radius:8px; cursor:pointer; font-weight:700; font-size:0.75rem;">حذف</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.filterPosCat = function(cat, btn) {
+      currentPosCat = cat;
+      document.querySelectorAll('.pos-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPosGrid();
+    };
+
+    window.renderPosGrid = function() {
+      const grid = document.getElementById('pos-grid');
+      const searchQuery = document.getElementById('pos-search-input')?.value.trim().toLowerCase() || '';
+      
+      let filtered = menuItems.filter(i => i.type === currentPosCat);
+      if (searchQuery) {
+        filtered = menuItems.filter(i => i.name.toLowerCase().includes(searchQuery));
+      }
+
+      if(filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-gray); padding:20px;">لا توجد عناصر مطابقة.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const subItemsHtml = (item.type === 'pack' && item.subItems && item.subItems.length > 0)
+          ? `<div style="font-size:0.72rem; color:var(--gold-main); margin-top:4px; line-height:1.2;">📦 ${formatSubItems(item.subItems)}</div>`
+          : '';
+
+        return `
+          <div class="pos-item-card" onclick="addToPosCartById('${item.id}')">
+            <div>
+              <strong style="font-size:0.9rem; color:#fff; line-height:1.2;">${item.name}</strong>
+              ${subItemsHtml}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+              <span style="font-size:0.85rem; color:var(--gold-main); font-weight:900;">${item.price} د.ج</span>
+              ${item.type === 'drink' ? `<span style="font-size:0.72rem; color:var(--text-gray);">المخزون: ${item.stock !== undefined ? item.stock : 0}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.addToPosCartById = function(id) {
+      const item = menuItems.find(i => i.id === id);
+      if(item) {
+        posCart.push({ ...item });
+        renderPosCart();
+      }
+    };
+
+    window.removeFromPosCart = function(index) {
+      posCart.splice(index, 1);
+      renderPosCart();
+    };
+
+    function renderPosCart() {
+      const list = document.getElementById('pos-cart-list');
+      const totalEl = document.getElementById('pos-total');
+      const total = posCart.reduce((sum, i) => sum + Number(i.price), 0);
+
+      totalEl.innerText = total + " د.ج";
+
+      if(posCart.length === 0) {
+        list.innerHTML = `<div style="text-align:center; color:var(--text-gray); padding: 25px 0;">السلة فارغة</div>`;
+        return;
+      }
+
+      list.innerHTML = posCart.map((item, index) => {
+        const subStr = (item.type === 'pack' && item.subItems) ? `<div style="font-size:0.72rem; color:var(--gold-main);">${formatSubItems(item.subItems)}</div>` : '';
+        return `
+          <div class="pos-cart-item">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">${item.name}</div>
+              ${subStr}
+              <strong style="color:var(--gold-main); font-size:0.8rem;">${item.price} د.ج</strong>
+            </div>
+            <button onclick="removeFromPosCart(${index})" style="background:rgba(255,30,56,0.1); border:1px solid rgba(255,30,56,0.2); width:24px; height:24px; border-radius:50%; color:var(--red-main); font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deductStockForItems(items) {
+      if(!items || !Array.isArray(items)) return;
+      for (const cartItem of items) {
+        if(cartItem.type === 'drink') {
+          const menuItem = menuItems.find(m => m.id === cartItem.id || m.name.trim() === cartItem.name.trim());
+          if (menuItem) {
+            const currentStock = Number(menuItem.stock || 0);
+            const newStock = Math.max(0, currentStock - 1);
+            await updateDoc(doc(db, "menu", menuItem.id), { stock: newStock });
+          }
+        } else if(cartItem.type === 'pack' && cartItem.subItems) {
+          for (const sub of cartItem.subItems) {
+            const subName = typeof sub === 'object' ? sub.name : sub;
+            const subQty = typeof sub === 'object' ? (sub.qty || 1) : 1;
+            const menuItem = menuItems.find(m => m.name.trim() === subName.trim() && m.type === 'drink');
+            if (menuItem) {
+              const currentStock = Number(menuItem.stock || 0);
+              const newStock = Math.max(0, currentStock - subQty);
+              await updateDoc(doc(db, "menu", menuItem.id), { stock: newStock });
+            }
+          }
+        }
+      }
+    }
+
+    window.confirmAndPrintPos = async function() {
+      if(posCart.length === 0) { alert("الرجاء إضافة عناصر للطلب أولاً !"); return; }
+
+      const total = posCart.reduce((sum, i) => sum + Number(i.price), 0);
+      const now = new Date();
+      const formattedTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const fullDateStr = `${now.toLocaleDateString('ar-DZ')} - ${formattedTime}`;
+
+      await deductStockForItems(posCart);
+
+      await addDoc(collection(db, "orders"), {
+        phone: "طلب محلي (حضوري)",
+        items: posCart,
+        total: total,
+        status: "تم التوصيل ✅",
+        time: formattedTime,
+        createdAt: serverTimestamp()
+      });
+
+      document.getElementById('receipt-time').innerText = `التاريخ والوقت: ${fullDateStr}`;
+      document.getElementById('receipt-total-val').innerText = `${total} د.ج`;
+      document.getElementById('receipt-items-body').innerHTML = posCart.map(item => `
+        <tr>
+          <td>${item.name} ${item.subItems ? '<br><small>(' + formatSubItems(item.subItems) + ')</small>' : ''}</td>
+          <td class="num">${item.price} د.ج</td>
+        </tr>
+      `).join('');
+
+      window.print();
+      posCart = [];
+      renderPosCart();
+    };
+
+    window.switchExpenseType = function(type) {
+      currentExpenseType = type;
+      const btnDrink = document.getElementById('btn-exp-drink');
+      const btnGen = document.getElementById('btn-exp-general');
+      const formDrink = document.getElementById('form-exp-drink');
+      const formGen = document.getElementById('form-exp-general');
+
+      if(type === 'drink') {
+        btnDrink.classList.add('active');
+        btnGen.classList.remove('active');
+        formDrink.style.display = 'block';
+        formGen.style.display = 'none';
+      } else {
+        btnGen.classList.add('active');
+        btnDrink.classList.remove('active');
+        formGen.style.display = 'block';
+        formDrink.style.display = 'none';
+      }
+    };
+
+    window.addExpenseItem = async function() {
+      if(currentExpenseType === 'drink') {
+        const select = document.getElementById('expense-drink-select');
+        const drinkId = select.value;
+        const drinkName = select.options[select.selectedIndex]?.text;
+        const qty = Number(document.getElementById('expense-drink-qty').value);
+        const unitPrice = Number(document.getElementById('expense-drink-unit-price').value);
+
+        if(!drinkId || !qty || qty <= 0 || !unitPrice || unitPrice <= 0) {
+          alert("يرجى اختيار المشروب وتحديد الكمية وثمن الوحدة الواحدة بشكل صحيح.");
+          return;
+        }
+
+        const totalPrice = qty * unitPrice;
+        await addDoc(collection(db, "expenses"), {
+          name: drinkName,
+          category: 'drink',
+          unitPrice: unitPrice,
+          quantity: qty,
+          price: totalPrice,
+          createdAt: serverTimestamp()
+        });
+
+        await updateDoc(doc(db, "menu", drinkId), {
+          stock: increment(qty),
+          costPrice: unitPrice
+        });
+
+        document.getElementById('expense-drink-qty').value = '';
+        document.getElementById('expense-drink-unit-price').value = '';
+      } else {
+        const name = document.getElementById('expense-gen-name').value.trim();
+        const totalPrice = Number(document.getElementById('expense-gen-price').value);
+
+        if(!name || !totalPrice || totalPrice <= 0) {
+          alert("يرجى إدخال اسم الشيء والمبلغ الإجمالي للشراء.");
+          return;
+        }
+
+        await addDoc(collection(db, "expenses"), {
+          name: name,
+          category: 'general',
+          price: totalPrice,
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById('expense-gen-name').value = '';
+        document.getElementById('expense-gen-price').value = '';
+      }
+    };
+
+    onSnapshot(query(collection(db, "expenses"), orderBy("createdAt", "desc")), (snapshot) => {
+      const container = document.getElementById('expenses-list');
+      let totalExpensesRecorded = 0;
+
+      snapshot.docs.forEach(docSnap => {
+        totalExpensesRecorded += Number(docSnap.data().price || 0);
+      });
+
+      const purchaseDocs = snapshot.docs.filter(docSnap => docSnap.data().category !== 'sale_deduction');
+      document.getElementById('stat-expenses').innerText = totalExpensesRecorded + " د.ج";
+
+      if (purchaseDocs.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--text-gray); padding:20px;">لا توجد مشتريات مسجلة.</div>`;
+        return;
+      }
+
+      container.innerHTML = purchaseDocs.map(docSnap => {
+        const exp = docSnap.data();
+        const id = docSnap.id;
+        const expPrice = Number(exp.price || 0);
+        
+        let dateFormatted = "غير محدد";
+        if (exp.createdAt && exp.createdAt.toDate) {
+          const d = exp.createdAt.toDate();
+          dateFormatted = `${d.toLocaleDateString('ar-DZ')} - ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }
+
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border:1px solid var(--border-light); padding:12px 14px; border-radius:12px;">
+            <div>
+              <strong style="color:#fff; font-size:0.9rem;">📦 ${exp.name}</strong>
+              ${exp.category === 'drink' ? `
+                <div style="font-size:0.75rem; color:var(--gold-main); margin-top:2px;">
+                  الكمية: <strong>${exp.quantity}</strong> | الوحدة: <strong>${exp.unitPrice} د.ج</strong>
+                </div>
+              ` : `
+                <div style="font-size:0.75rem; color:var(--text-gray); margin-top:2px;">سلعة عامة للمحل</div>
+              `}
+              <div style="font-size:0.72rem; color:var(--text-gray); margin-top:3px;">📅 ${dateFormatted}</div>
+            </div>
+            <div style="text-align:left;">
+              <div style="font-size:0.9rem; color:var(--red-main); font-weight:900; margin-bottom:4px;">-${expPrice} د.ج</div>
+              <button onclick="deleteExpense('${id}')" style="background:rgba(255,30,56,0.12); color:var(--red-main); border:1px solid rgba(255,30,56,0.3); padding:4px 8px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.72rem;">حذف</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    });
+
+    window.deleteExpense = async function(id) {
+      if(confirm("هل تريد حذف هذا العنصر من سجل المصاريف والأرشيف؟")) {
+        await deleteDoc(doc(db, "expenses", id));
+      }
+    };
+
+    onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), (snapshot) => {
+      const pendingContainer = document.getElementById('orders-pending');
+      const cookingContainer = document.getElementById('orders-cooking');
+      const deliveryContainer = document.getElementById('orders-delivery');
+      const salesContainer = document.getElementById('sales-list');
+
+      activeOrdersMap.clear();
+
+      let pendingHtml = '', cookingHtml = '', deliveryHtml = '';
+      let pCount = 0, cCount = 0, dCount = 0;
+      let todayCount = 0, todayRevenue = 0;
+
+      const todayStr = new Date().toDateString();
+      let completedSalesHtml = '';
+
+      if(previousOrdersCount !== null && snapshot.docs.length > previousOrdersCount) {
+        playNotificationSound();
+      }
+      previousOrdersCount = snapshot.docs.length;
+
+      snapshot.docs.forEach(docSnap => {
+        const ord = docSnap.data();
+        const id = docSnap.id;
+        activeOrdersMap.set(id, ord);
+
+        const status = ord.status || 'En attente';
+        const gpsLink = (ord.gps && ord.gps.lat !== "Non spécifié") ? `https://maps.google.com/?q=${ord.gps.lat},${ord.gps.lng}` : '#';
+
+        if (ord.createdAt) {
+          const orderDate = ord.createdAt.toDate ? ord.createdAt.toDate().toDateString() : new Date().toDateString();
+          if (orderDate === todayStr && status !== 'En attente') {
+            todayCount++;
+            todayRevenue += Number(ord.total || 0);
+          }
+        }
+
+        const itemsList = Array.isArray(ord.items) ? ord.items : [];
+
+        const cardContent = `
+          <div class="order-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid var(--border-light); padding-bottom:6px;">
+              <span style="font-weight:900; color:var(--red-main); font-size: 0.9rem;">📞 ${ord.phone}</span>
+              <span style="font-size:0.72rem; color:var(--text-gray); background:var(--bg-main); padding:2px 6px; border-radius:6px; border:1px solid var(--border-light);">${ord.time || ''}</span>
+            </div>
+            
+            <ul style="list-style:none; margin-bottom:8px; font-size:0.85rem; color:#e0e0e0;">
+              ${itemsList.map(i => `
+                <li style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div>
+                    <span>• ${i.name}</span>
+                    ${i.subItems ? `<div style="font-size:0.72rem; color:var(--gold-main); margin-right:8px;">📦 (${formatSubItems(i.subItems)})</div>` : ''}
+                  </div>
+                  <strong style="color:var(--gold-main);">${i.price} د.ج</strong>
+                </li>
+              `).join('')}
+            </ul>
+
+            ${ord.phone !== "طلب محلي (حضوري)" ? `
+              <div style="margin-bottom:8px; background:var(--bg-main); padding:4px 8px; border-radius:6px; border:1px solid var(--border-light);">
+                <a href="${gpsLink}" target="_blank" style="color:var(--gold-main); font-size:0.75rem; text-decoration:none; font-weight:700;">📍 موقع الزبون (GPS)</a>
+              </div>
+            ` : ''}
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-light); padding-top:8px; margin-top:6px;">
+              <div style="font-size:0.85rem;">المجموع: <strong style="color:var(--gold-main);">${ord.total} د.ج</strong></div>
+              <div style="display:flex; gap:4px;">
+                ${status.includes('attente') ? `
+                  <button onclick="acceptOrderAndDeductStock('${id}')" class="kanban-action-btn" style="background:rgba(0,210,180,0.15); color:var(--green-main); border-color:rgba(0,210,180,0.3);">قبول</button>
+                  <button onclick="deleteOrder('${id}')" class="kanban-action-btn" style="background:rgba(255,30,56,0.15); color:var(--red-main); border-color:rgba(255,30,56,0.3);">حذف</button>
+                ` : ''}
+                ${status.includes(' التحضير') ? `
+                  <button onclick="updateOrderStatus('${id}', 'في الطريق 🛵')" class="kanban-action-btn" style="background:rgba(245,197,24,0.15); color:var(--gold-main); border-color:rgba(245,197,24,0.3);">إرسال</button>
+                ` : ''}
+                ${status.includes(' الطريق') ? `
+                  <button onclick="updateOrderStatus('${id}', 'تم التوصيل ✅')" class="kanban-action-btn" style="background:rgba(0,210,180,0.2); color:var(--green-main); border-color:rgba(0,210,180,0.4);">تأكيد وصل</button>
+                ` : ''}
+                ${status.includes(' التوصيل') ? `
+                  <button onclick="deleteOrder('${id}')" class="kanban-action-btn" style="background:rgba(255,30,56,0.15); color:var(--red-main); border-color:rgba(255,30,56,0.3);">أرشفة</button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+
+        if (status.includes('attente')) { pCount++; pendingHtml += cardContent; }
+        else if (status.includes(' التحضير')) { cCount++; cookingHtml += cardContent; }
+        else { dCount++; deliveryHtml += cardContent; }
+
+        if (status.includes('تم التوصيل') || status.includes('التحضير') || status.includes('الطريق')) {
+          let dateFormatted = ord.time || "غير محدد";
+          if (ord.createdAt && ord.createdAt.toDate) {
+            const d = ord.createdAt.toDate();
+            dateFormatted = `${d.toLocaleDateString('ar-DZ')} - ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+          }
+
+          completedSalesHtml += `
+            <div style="background:var(--bg-card); border:1px solid rgba(0,210,180,0.2); padding:12px 14px; border-radius:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; border-bottom:1px solid var(--border-light); padding-bottom:4px;">
+                <strong style="color:var(--gold-main); font-size:0.85rem;">🛒 ${ord.phone}</strong>
+                <span style="font-size:0.72rem; color:var(--text-gray);">📅 ${dateFormatted}</span>
+              </div>
+              <div style="font-size:0.8rem; color:#ccc; margin-bottom:6px;">
+                ${itemsList.map(i => `${i.name}${i.subItems ? ' ('+formatSubItems(i.subItems)+')' : ''} (${i.price} د.ج)`).join(' ، ')}
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.75rem; color:var(--green-main); font-weight:700;">حالة: ${ord.status}</span>
+                <strong style="color:var(--green-main); font-size:0.95rem;">+${ord.total} د.ج</strong>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      pendingContainer.innerHTML = pendingHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات جديدة.</div>`;
+      cookingContainer.innerHTML = cookingHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات قيد التحضير.</div>`;
+      deliveryContainer.innerHTML = deliveryHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات في الطريق.</div>`;
+      salesContainer.innerHTML = completedSalesHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px;">لا توجد مبيعات مسجلة بعد.</div>`;
+
+      document.getElementById('count-pending').innerText = pCount;
+      document.getElementById('count-cooking').innerText = cCount;
+      document.getElementById('count-delivery').innerText = dCount;
+
+      document.getElementById('stat-count').innerText = todayCount;
+      document.getElementById('stat-revenue').innerText = todayRevenue + " د.ج";
+    });
+
+    window.acceptOrderAndDeductStock = async function(id) {
+      const ord = activeOrdersMap.get(id);
+      if(ord && ord.items) {
+        await deductStockForItems(ord.items);
+      }
+      await updateDoc(doc(db, "orders", id), { status: "قيد التحضير 👨‍🍳" });
+    };
+
+    window.updateOrderStatus = async function(id, statusText) {
+      await updateDoc(doc(db, "orders", id), { status: statusText });
+    };
+
+    window.deleteOrder = async function(id) {
+      if(confirm("هل أنت متأكد من حذف هذه الطلبية؟")) {
+        await deleteDoc(doc(db, "orders", id));
+      }
+    };
+
+    window.openSettingsModal = function() {
+      document.getElementById('settings-modal').style.display = 'flex';
+      renderNewPackCheckboxes();
+    };
+    window.closeSettingsModal = function() { document.getElementById('settings-modal').style.display = 'none'; };
+
+    window.openEditModal = function(id) {
+      const item = menuItems.find(i => i.id === id);
+      if(!item) return;
+
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-name').value = item.name || '';
+      document.getElementById('edit-price').value = item.price || 0;
+      document.getElementById('edit-cost').value = item.costPrice !== undefined ? item.costPrice : 0;
+      document.getElementById('edit-stock').value = item.stock !== undefined ? item.stock : 0;
+      document.getElementById('edit-type').value = item.type || 'food';
+      
+      const packContainer = document.getElementById('edit-pack-container');
+      if (item.type === 'pack') {
+        packContainer.style.display = 'block';
+        renderEditPackCheckboxes(item.subItems || []);
+      } else {
+        packContainer.style.display = 'none';
+        renderEditPackCheckboxes([]);
+      }
+
+      document.getElementById('edit-modal').style.display = 'flex';
+    };
+
+    window.closeEditModal = function() { document.getElementById('edit-modal').style.display = 'none'; };
+
+    window.saveEditedItem = async function() {
+      const id = document.getElementById('edit-id').value;
+      const name = document.getElementById('edit-name').value.trim();
+      const price = document.getElementById('edit-price').value.trim();
+      const costPrice = document.getElementById('edit-cost').value.trim();
+      const stock = document.getElementById('edit-stock').value.trim();
+      const type = document.getElementById('edit-type').value;
+
+      let subItems = [];
+      if (type === 'pack') {
+        const rows = document.querySelectorAll('#edit-pack-items-list .pack-item-row');
+        rows.forEach(row => {
+          const cb = row.querySelector('input[type="checkbox"]');
+          const qtyInput = row.querySelector('input[type="number"]');
+          if (cb && cb.checked) {
+            const qty = Number(qtyInput.value) || 1;
+            subItems.push({ name: cb.value, qty: qty });
+          }
+        });
+      }
+
+      if(!name || !price) return;
+      await updateDoc(doc(db, "menu", id), {
+        name, 
+        price: Number(price), 
+        costPrice: Number(costPrice || 0),
+        stock: Number(stock || 0),
+        type, 
+        subItems,
+        badge: type === 'pack' ? 'PACK VIP' : (type === 'drink' ? 'مشروب' : 'وجبة')
+      });
+      closeEditModal();
+    };
+
+    window.deleteMenuItem = async function(itemId) {
+      if(confirm("هل أنت متأكد من حذف هذا العنصر؟")) {
+        await deleteDoc(doc(db, "menu", itemId));
+      }
+    };
+
+    window.addNewItem = async function() {
+      const name = document.getElementById('new-name').value.trim();
+      const price = document.getElementById('new-price').value.trim();
+      const costPrice = document.getElementById('new-cost').value.trim();
+      const stock = document.getElementById('new-stock').value.trim();
+      const type = document.getElementById('new-type').value;
+
+      let subItems = [];
+      if (type === 'pack') {
+        const rows = document.querySelectorAll('#new-pack-items-list .pack-item-row');
+        rows.forEach(row => {
+          const cb = row.querySelector('input[type="checkbox"]');
+          const qtyInput = row.querySelector('input[type="number"]');
+          if (cb && cb.checked) {
+            const qty = Number(qtyInput.value) || 1;
+            subItems.push({ name: cb.value, qty: qty });
+          }
+        });
+      }
+
+      if(!name || !price) return;
+      await addDoc(collection(db, "menu"), {
+        name, 
+        price: Number(price), 
+        costPrice: Number(costPrice || 0),
+        stock: Number(stock || 0),
+        type, 
+        subItems,
+        badge: type === 'pack' ? 'PACK VIP' : (type === 'drink' ? 'مشروب' : 'وجبة')
+      });
+
+      document.getElementById('new-name').value = '';
+      document.getElementById('new-price').value = '';
+      document.getElementById('new-cost').value = '0';
+      document.getElementById('new-stock').value = '0';
+      document.getElementById('new-type').value = 'food';
+      document.getElementById('new-pack-container').style.display = 'none';
+    };
+  </script>
+</body>
+</html>
