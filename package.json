@@ -2,10 +2,11 @@
   "name": "pablo-pos-app",
   "version": "1.0.0",
   "description": "Pablo Escobare POS Application",
+  "author": "Pablo",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build:win32": "electron-builder --win --ia32"
+    "build:win32": "electron-builder --win --ia32 -c.publish=never"
   },
   "devDependencies": {
     "electron": "22.3.27",
