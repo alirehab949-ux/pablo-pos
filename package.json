@@ -8,8 +8,8 @@
     "build:win32": "electron-builder --win --ia32"
   },
   "devDependencies": {
-    "electron": "13.6.9",
-    "electron-builder": "22.14.13"
+    "electron": "22.3.27",
+    "electron-builder": "23.6.0"
   },
   "build": {
     "appId": "com.pablo.pos",
@@ -25,7 +25,3 @@
     }
   }
 }
-}
-}
-}
-
