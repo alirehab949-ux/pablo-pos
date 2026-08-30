@@ -1,0 +1,32 @@
+{
+  "name": "pablo-pos-app",
+  "version": "1.0.0",
+  "description": "Pablo Escobare POS Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win32": "electron-builder --win --ia32"
+  },
+  "devDependencies": {
+    "electron": "22.3.27",
+    "electron-builder": "23.6.0"
+  },
+  "build": {
+    "appId": "com.pablo.pos",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32"
+          ]
+        }
+      ]
+    }
+  }
+}
+
+}
+}
+}
+
