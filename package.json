@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win --ia32",
-    "build:win32": "electron-builder --win --ia32"
+    "build": "electron-builder --win --ia32 --publish never",
+    "build:win32": "electron-builder --win --ia32 --publish never"
   },
   "build": {
     "appId": "com.pablo.dashboard",
@@ -27,7 +27,8 @@
           ]
         }
       ]
-    }
+    },
+    "publish": null
   },
   "devDependencies": {
     "electron": "18.3.15",
