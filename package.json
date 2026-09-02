@@ -1,20 +1,22 @@
 {
-  "name": "pablo-pos-app",
+  "name": "pablo-escobare-dashboard",
   "version": "1.0.0",
-  "description": "Pablo Escobare POS Application",
-  "author": "Pablo",
+  "description": "Pablo Escobare Admin Dashboard",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build:win32": "electron-builder --win --ia32 --publish never"
-  },
-  "devDependencies": {
-    "electron": "22.3.27",
-    "electron-builder": "23.6.0"
+    "build": "electron-builder --win --ia32"
   },
   "build": {
-    "appId": "com.pablo.pos",
-    "publish": null,
+    "appId": "com.pablo.dashboard",
+    "productName": "Pablo Escobare Dashboard",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "main.js"
+    ],
     "win": {
       "target": [
         {
@@ -25,5 +27,9 @@
         }
       ]
     }
+  },
+  "devDependencies": {
+    "electron": "18.3.15",
+    "electron-builder": "^24.9.0"
   }
 }
