@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
+// تفعيل ميزات البلوتوث لمتصفح Chromium المدمج
 app.commandLine.appendSwitch('enable-web-bluetooth');
 app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 
@@ -16,6 +17,7 @@ function createWindow() {
     }
   });
 
+  // اختيار جهاز البلوتوث المتاح تلقائياً عند الاتصال
   win.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
     event.preventDefault();
     if (deviceList && deviceList.length > 0) {
