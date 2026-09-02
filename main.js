@@ -1,23 +1,31 @@
-
 const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
-// إجبار الويندوز على الحفاظ على الدقة الأصلية ومنع الضبابية
-app.commandLine.appendSwitch('high-dpi-support', '1');
-app.commandLine.appendSwitch('force-device-scale-factor', '1');
+app.commandLine.appendSwitch('enable-web-bluetooth');
+app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 
-function createWindow () {
+function createWindow() {
   const win = new BrowserWindow({
-    width: 1200, // يمكنك تعديل العرض
-    height: 800, // يمكنك تعديل الطول
+    width: 1280,
+    height: 800,
+    title: "Pablo Escobare Dashboard",
+    autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      zoomFactor: 1.0 // منع تكبير العناصر داخلياً
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  win.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
+    event.preventDefault();
+    if (deviceList && deviceList.length > 0) {
+      callback(deviceList[0].deviceId);
+    } else {
+      callback('');
     }
   });
 
   win.loadFile('index.html');
-  win.maximize(); // لفتح البرنامج بكامل الشاشة فور تشغيله
 }
 
 app.whenReady().then(createWindow);
