@@ -20,6 +20,11 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
+    - name: Create www folder (Fix Web Assets Error)
+      run: |
+        mkdir -p www
+        find . -maxdepth 1 ! -name '.' ! -name 'www' ! -name 'node_modules' ! -name '.git' ! -name '.github' -exec cp -r {} www/ \;
+
     - name: Add Android Platform
       run: npm install @capacitor/android && npx cap add android
 
