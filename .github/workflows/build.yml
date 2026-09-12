@@ -48,11 +48,27 @@ jobs:
           mkdir -p android/gradle
           echo "android.suppressUnsupportedCompileSdk=34" >> android/gradle.properties
 
-      - name: Force Java 8 Compatibility (Lowest supported for modern Android SDKs)
+      - name: Fix Kotlin Conflict (Force Stable Version)
+        run: |
+          cat << 'EOF' >> android/build.gradle
+
+          allprojects {
+              configurations.all {
+                  resolutionStrategy {
+                      force "org.jetbrains.kotlin:kotlin-stdlib:1.9.24"
+                      force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24"
+                      force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.24"
+                      force "org.jetbrains.kotlin:kotlin-stdlib-common:1.9.24"
+                  }
+              }
+          }
+          EOF
+
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '8'
+          java-version: '17'
 
       - name: Build APK
         run: |
