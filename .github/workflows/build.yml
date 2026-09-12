@@ -39,7 +39,6 @@ jobs:
     - name: Add Bluetooth Permissions
       run: |
         MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
-        # إضافة الأذونات قبل وسم </manifest> مباشرة
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.BLUETOOTH"/>' $MANIFEST_PATH
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>' $MANIFEST_PATH
         sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>' $MANIFEST_PATH
