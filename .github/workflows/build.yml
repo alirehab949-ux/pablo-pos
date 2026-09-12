@@ -34,6 +34,17 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Update SDK Version to 34
+        run: |
+          find android -name "build.gradle" -o -name "variables.gradle" | while read file; do
+            sed -i 's/compileSdkVersion 33/compileSdkVersion 34/g' "$file"
+            sed -i 's/targetSdkVersion 33/targetSdkVersion 34/g' "$file"
+            sed -i 's/compileSdk = 33/compileSdk = 34/g' "$file"
+            sed -i 's/targetSdk = 33/targetSdk = 34/g' "$file"
+            sed -i 's/compileSdkVersion = 33/compileSdkVersion = 34/g' "$file"
+            sed -i 's/targetSdkVersion = 33/targetSdkVersion = 34/g' "$file"
+          done
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
