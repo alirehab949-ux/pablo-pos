@@ -26,6 +26,13 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
+    - name: Prepare Web Assets Folder
+      run: |
+        mkdir -p www
+        cp index.html www/ 2>/dev/null || true
+        cp *.js www/ 2>/dev/null || true
+        cp *.css www/ 2>/dev/null || true
+
     - name: Add Android Platform
       run: npx cap add android
 
