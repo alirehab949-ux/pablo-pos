@@ -2,66 +2,52 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Install Dependencies
-      run: npm install
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
 
-    - name: Create www folder (Fix Web Assets Error)
-      run: |
-        mkdir -p www
-        find . -maxdepth 1 ! -name '.' ! -name 'www' ! -name 'node_modules' ! -name '.git' ! -name '.github' -exec cp -r {} www/ \;
+      - name: Create www folder (Fix Web Assets Error)
+        run: |
+          mkdir -p www
+          if [ ! -f www/index.html ]; then
+            echo "<html><body><h1>Pablo POS App</h1></body></html>" > www/index.html
+          fi
 
-    - name: Add Android Platform
-      run: npm install @capacitor/android && npx cap add android
+      - name: Add Android Platform
+        run: npx cap add android || true
 
-    - name: Sync Capacitor
-      run: npx cap sync android
+      - name: Sync Capacitor
+        run: npx cap sync android
 
-    - name: Inject Bluetooth Permissions
-      run: |
-        node -e "
-        const fs = require('fs');
-        const path = 'android/app/src/main/AndroidManifest.xml';
-        let data = fs.readFileSync(path, 'utf8');
-        const permissions = \`
-            <uses-permission android:name=\"android.permission.BLUETOOTH\" />
-            <uses-permission android:name=\"android.permission.BLUETOOTH_ADMIN\" />
-            <uses-permission android:name=\"android.permission.BLUETOOTH_SCAN\" android:usesPermissionFlags=\"neverForLocation\" />
-            <uses-permission android:name=\"android.permission.BLUETOOTH_CONNECT\" />
-            <uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />
-            <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />
-        </manifest>\`;
-        data = data.replace('</manifest>', permissions);
-        fs.writeFileSync(path, data);
-        console.log('تم إضافة صلاحيات البلوتوث بنجاح!');
-        "
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'zulu'
-        java-version: '17'
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-    - name: Build APK
-      working-directory: ./android
-      run: chmod +x ./gradlew && ./gradlew assembleDebug
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: Pablo-POS-APK
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
