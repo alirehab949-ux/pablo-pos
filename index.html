@@ -636,8 +636,7 @@
     
     // متغيرات معالجة الطلب والبلوتوث
     let isSubmittingPos = false;
-    let bluetoothDevice = null;
-    let bluetoothCharacteristic = null;
+    window.selectedPrinterDeviceId = null;
 
     // --- نظام التنبيهات المخصص Glassmorphic Custom Dialogs (بديل Alert & Confirm) ---
     window.showCustomAlert = function(message, title = "تنبيه 🔔") {
@@ -719,87 +718,119 @@
       return null;
     }
 
-    // --- نظام ربط وطباعة البلوتوث الحرارية ESC/POS (80mm) ---
+    // --- نظام ربط البلوتوث عبر Capacitor BluetoothLe ---
     window.connectBluetoothPrinter = async function() {
       try {
-        const btn = document.getElementById('bt-connect-btn');
-        btn.innerText = "جاري البحث... 🔍";
+        const BluetoothLe = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.BluetoothLe;
         
-        bluetoothDevice = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2', '0000ff00-0000-1000-8000-00805f9b34fb']
+        if (!BluetoothLe) {
+          await window.showCustomAlert(
+            "إضافة البلوتوث غير محملة في هذا التطبيق. تأكد من إضافة حزمة @capacitor-community/bluetooth-le إلى مشروعك.",
+            "خطأ في النظام ❌"
+          );
+          return;
+        }
+
+        const btn = document.getElementById('bt-connect-btn');
+        btn.innerText = "جاري تهيئة البلوتوث... 🔍";
+
+        await BluetoothLe.initialize();
+
+        btn.innerText = "جاري البحث عن الأجهزة... 🖨️";
+        
+        const device = await BluetoothLe.requestDevice({
+          allowAllDevices: true
         });
 
-        const server = await bluetoothDevice.gatt.connect();
-        const services = await server.getPrimaryServices();
-        
-        for (const service of services) {
-          const characteristics = await service.getCharacteristics();
-          if (characteristics.length > 0) {
-            bluetoothCharacteristic = characteristics[0];
-            break;
-          }
+        if (!device || !device.deviceId) {
+          throw new Error("لم يتم اختيار أي جهاز.");
         }
 
-        if (bluetoothCharacteristic) {
-          btn.innerText = "✅ متصل بـ: " + (bluetoothDevice.name || "الطابعة");
-          btn.style.color = "var(--green-main)";
-        } else {
-          await window.showCustomAlert("تعذر العثور على خاصية كتابة للطباعة في هذا الجهاز.", "خطأ في الطابعة ⚠️");
-          btn.innerText = "📲 Bluetooth";
-        }
+        btn.innerText = "جاري الاتصال بـ: " + (device.name || "الطابعة") + " ...";
+        
+        await BluetoothLe.connect({
+          deviceId: device.deviceId
+        });
+
+        window.selectedPrinterDeviceId = device.deviceId;
+
+        btn.innerText = "✅ متصل بـ: " + (device.name || "الطابعة");
+        btn.style.color = "var(--green-main)";
+
       } catch (error) {
         console.error("Bluetooth connection error:", error);
-        await window.showCustomAlert("لم يتم الاتصال بالطابعة: " + error.message, "فشل الاتصال ❌");
+        if (error.message && !error.message.includes("cancelled")) {
+          await window.showCustomAlert("فشل الاتصال بالطابعة: " + error.message, "فشل الاتصال ❌");
+        }
         document.getElementById('bt-connect-btn').innerText = "📲 Bluetooth";
       }
     };
 
-    async function printToBluetoothThermal(cartData, totalVal, dateStr) {
-      if (!bluetoothCharacteristic) return false;
-
+    // --- نظام طباعة الإيصالات الحرارية عبر Capacitor BluetoothLe ---
+    window.printToThermalPrinter = async function(base64Data) {
       try {
-        const encoder = new TextEncoder();
-        let receiptText = "\x1B\x40"; // ESC @ Reset Printer
-        receiptText += "\x1B\x61\x01"; // ESC a 1 (Center Align)
-        receiptText += "\x1D\x21\x11"; // Double size text
-        receiptText += "PABLO ESCOBARE\n";
-        receiptText += "\x1D\x21\x00"; // Normal size
-        receiptText += "Restaurant & Fast Food\n";
-        receiptText += "------------------------------------------------\n";
-        receiptText += "\x1B\x61\x02"; // Right Align
-        receiptText += `Date: ${dateStr}\n`;
-        receiptText += "Type: Local (POS)\n";
-        receiptText += "------------------------------------------------\n";
+        const BluetoothLe = window.Capacitor?.Plugins?.BluetoothLe;
+        if (!window.selectedPrinterDeviceId || !BluetoothLe) {
+          await window.showCustomAlert("الرجاء الاتصال بالطابعة أولاً!", "تنبيه الطابعة 🖨️");
+          return false;
+        }
 
-        cartData.forEach(item => {
-          const subText = item.subItems ? ` (${window.formatSubItems(item.subItems)})` : '';
-          receiptText += `${item.name}${subText}\n`;
-          receiptText += `                         ${item.price} DA\n`;
+        const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
+        const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+        await BluetoothLe.write({
+          deviceId: window.selectedPrinterDeviceId,
+          service: SERVICE_UUID,
+          characteristic: CHARACTERISTIC_UUID,
+          value: base64Data
         });
 
-        receiptText += "------------------------------------------------\n";
-        receiptText += "\x1D\x21\x01"; // Bold text
-        receiptText += `TOTAL: ${totalVal} DA\n`;
-        receiptText += "\x1D\x21\x00";
-        receiptText += "------------------------------------------------\n";
-        receiptText += "\x1B\x61\x01"; // Center Align
-        receiptText += "Thank you for your visit!\n\n\n\n";
-        receiptText += "\x1D\x56\x41\x00"; // GS V Paper Cut Command
-
-        const data = encoder.encode(receiptText);
-        
-        // Split data into chunks to avoid Bluetooth buffer overflows
-        const chunkSize = 100;
-        for (let i = 0; i < data.length; i += chunkSize) {
-          const chunk = data.slice(i, i + chunkSize);
-          await bluetoothCharacteristic.writeValue(chunk);
-        }
+        console.log("تمت الطباعة بنجاح");
         return true;
       } catch (err) {
-        console.error("Direct BT print failed:", err);
+        console.error("Print error:", err);
+        await window.showCustomAlert("حدث خطأ أثناء الطباعة: " + err.message, "خطأ طباعة ❌");
         return false;
       }
+    };
+
+    // وظيفة مساعدة لتوليد كود Base64 لأوامر الطباعة من النص العادي
+    function stringToBase64(str) {
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
+    }
+
+    async function printToBluetoothThermal(cartData, totalVal, dateStr) {
+      if (!window.selectedPrinterDeviceId) return false;
+
+      let receiptText = "\x1B\x40"; // ESC @ Reset Printer
+      receiptText += "\x1B\x61\x01"; // ESC a 1 (Center Align)
+      receiptText += "\x1D\x21\x11"; // Double size text
+      receiptText += "PABLO ESCOBARE\n";
+      receiptText += "\x1D\x21\x00"; // Normal size
+      receiptText += "Restaurant & Fast Food\n";
+      receiptText += "------------------------------------------------\n";
+      receiptText += "\x1B\x61\x02"; // Right Align
+      receiptText += `Date: ${dateStr}\n`;
+      receiptText += "Type: Local (POS)\n";
+      receiptText += "------------------------------------------------\n";
+
+      cartData.forEach(item => {
+        const subText = item.subItems ? ` (${window.formatSubItems(item.subItems)})` : '';
+        receiptText += `${item.name}${subText}\n`;
+        receiptText += `                         ${item.price} DA\n`;
+      });
+
+      receiptText += "------------------------------------------------\n";
+      receiptText += "\x1D\x21\x01"; // Bold text
+      receiptText += `TOTAL: ${totalVal} DA\n`;
+      receiptText += "\x1D\x21\x00";
+      receiptText += "------------------------------------------------\n";
+      receiptText += "\x1B\x61\x01"; // Center Align
+      receiptText += "Thank you for your visit!\n\n\n\n";
+      receiptText += "\x1D\x56\x41\x00"; // GS V Paper Cut Command
+
+      const base64Data = stringToBase64(receiptText);
+      return await window.printToThermalPrinter(base64Data);
     }
 
     window.switchAdminTab = function(tabId, btn) {
@@ -1158,11 +1189,11 @@
       }
     }
 
-    // --- تأكيد وتثبيت الطلب الحضوري (مع التنبيهات المخصصة) ---
+    // --- تأكيد وتثبيت الطلب الحضوري ---
     window.confirmAndPrintPos = async function() {
       if (isSubmittingPos) return;
 
-      if (!bluetoothCharacteristic) {
+      if (!window.selectedPrinterDeviceId) {
         await window.showCustomAlert("يرجى ربط طابعة البلوتوث أولاً عن طريق زر (📲 Bluetooth) أعلى الشاشة!", "تنبيه البلوتوث 📲");
       }
 
@@ -1184,7 +1215,7 @@
         const formattedTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         const fullDateStr = `${now.toLocaleDateString('ar-DZ')} - ${formattedTime}`;
 
-        // 1. الخصم السريع دفعة واحدة من قاعدة البيانات
+        // 1. الخصم السريع من المخزون
         await deductStockForItems(posCart);
 
         // 2. تسجيل الطلب في الهستوري
@@ -1197,15 +1228,15 @@
           createdAt: serverTimestamp()
         });
 
-        // 3. المحاولة للطباعة إذا كانت الطابعة متصلة، أو التنبيه بتسجيل الطلب
+        // 3. المحاولة للطباعة عبر البلوتوث الحراري
         let printedBT = false;
-        if (bluetoothCharacteristic) {
+        if (window.selectedPrinterDeviceId) {
           printedBT = await printToBluetoothThermal(posCart, total, fullDateStr);
         } else {
           await window.showCustomAlert("تم تسجيل الطلب وخصم المخزون بنجاح! ⚠️ <br><br>(لم يتم الطباعة لعدم اتصال طابعة البلوتوث)", "تم التسجيل بنجاح ✅");
         }
 
-        if (bluetoothCharacteristic && !printedBT) {
+        if (window.selectedPrinterDeviceId && !printedBT) {
           await window.showCustomAlert("تم تسجيل الطلب، لكن تعذرت الطباعة! يرجى التحقق من الطابعة.", "تنبيه الطباعة 🖨️");
         }
 
