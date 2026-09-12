@@ -34,7 +34,7 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Update SDK Version to 34
+      - name: Update SDK Version and Suppress Warning
         run: |
           find android -name "build.gradle" -o -name "variables.gradle" | while read file; do
             sed -i 's/compileSdkVersion 33/compileSdkVersion 34/g' "$file"
@@ -44,6 +44,10 @@ jobs:
             sed -i 's/compileSdkVersion = 33/compileSdkVersion = 34/g' "$file"
             sed -i 's/targetSdkVersion = 33/targetSdkVersion = 34/g' "$file"
           done
+          
+          # إضافة سطر تجاوز التحذير لملف gradle.properties لضمان اكتمال البناء
+          mkdir -p android/gradle
+          echo "android.suppressUnsupportedCompileSdk=34" >> android/gradle.properties
 
       - name: Setup Java
         uses: actions/setup-java@v4
