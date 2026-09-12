@@ -1,6 +1,6 @@
 {
-  "appId": "com.pablo.pos",
+  "appId": "com.pablo.escobare",
   "appName": "Pablo Escobare",
-  "webDir": "www",
+  "webDir": ".",
   "bundledWebRuntime": false
 }
