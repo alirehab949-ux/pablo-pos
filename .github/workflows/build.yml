@@ -47,15 +47,25 @@ jobs:
           sed -i 's/compileSdk = 33/compileSdk = 34/g' app/build.gradle || true
           sed -i 's/targetSdk = 33/targetSdk = 34/g' app/build.gradle || true
 
-      - name: Use Stable Gradle 8.0
+      - name: Enable MultiDex & Fix Kotlin Dex Issues
+        run: |
+          cd android/app
+          if ! grep -q "androidx.multidex:multidex" build.gradle; then
+            sed -i '/dependencies {/a \    implementation "androidx.multidex:multidex:2.0.1"' build.gradle
+          fi
+          cd ..
+          sed -i '/defaultConfig {/a \        multiDexEnabled true' app/build.gradle
+
+      - name: Use Stable Gradle 8.5
         run: |
           cd android
-          ./gradlew wrapper --gradle-version 8.0
+          ./gradlew wrapper --gradle-version 8.5
 
       - name: Build APK (Debug)
         run: |
           cd android
           chmod +x gradlew
+          ./gradlew clean
           ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
