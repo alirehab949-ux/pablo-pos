@@ -39,6 +39,14 @@ jobs:
           npx cap add android
           npx cap sync android
 
+      - name: Upgrade SDK to 34 for Bluetooth Compatibility
+        run: |
+          cd android
+          sed -i 's/compileSdkVersion = 33/compileSdkVersion = 34/g' variables.gradle || true
+          sed -i 's/targetSdkVersion = 33/targetSdkVersion = 34/g' variables.gradle || true
+          sed -i 's/compileSdk = 33/compileSdk = 34/g' app/build.gradle || true
+          sed -i 's/targetSdk = 33/targetSdk = 34/g' app/build.gradle || true
+
       - name: Use Stable Gradle 8.0
         run: |
           cd android
