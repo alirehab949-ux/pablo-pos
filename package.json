@@ -7,11 +7,10 @@
     "build": "echo 'No build script required for static files'"
   },
   "dependencies": {
-    "@capacitor-community/bluetooth-le": "5.0.1",
-    "@capacitor/core": "5.7.0"
+    "@capacitor/core": "^5.7.0"
   },
   "devDependencies": {
-    "@capacitor/android": "5.7.0",
-    "@capacitor/cli": "5.7.0"
+    "@capacitor/android": "^5.7.0",
+    "@capacitor/cli": "^5.7.0"
   }
 }
