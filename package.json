@@ -1,37 +1,14 @@
 {
-  "name": "pablo-escobare-dashboard",
+  "name": "pablo-pos",
   "version": "1.0.0",
-  "description": "Pablo Escobare Admin Dashboard",
-  "main": "main.js",
+  "description": "Pablo Escobare POS App",
+  "main": "index.js",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder --win --ia32 --publish never",
-    "build:win32": "electron-builder --win --ia32 --publish never"
+    "build": "echo 'No build step required'"
   },
-  "build": {
-    "appId": "com.pablo.dashboard",
-    "productName": "Pablo Escobare Dashboard",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "index.html",
-      "main.js"
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "ia32"
-          ]
-        }
-      ]
-    },
-    "publish": null
-  },
-  "devDependencies": {
-    "electron": "18.3.15",
-    "electron-builder": "^24.9.0"
+  "dependencies": {
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/core": "^5.0.0"
   }
 }
