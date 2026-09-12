@@ -31,18 +31,22 @@ jobs:
       - name: Install Capacitor & Dependencies
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core@5 @capacitor/cli@5 @capacitor/android@5
 
       - name: Initialize Capacitor Android & Sync
         run: |
           npx cap add android
           npx cap sync android
 
+      - name: Use Stable Gradle 8.0
+        run: |
+          cd android
+          ./gradlew wrapper --gradle-version 8.0
+
       - name: Build APK (Debug)
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew clean
           ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
