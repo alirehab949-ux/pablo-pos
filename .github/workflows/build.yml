@@ -34,7 +34,7 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Update SDK Version and Fix Gradle Config
+      - name: Update SDK Version and Suppress Warning
         run: |
           find android -name "build.gradle" -o -name "variables.gradle" | while read file; do
             sed -i 's/compileSdkVersion 33/compileSdkVersion 34/g' "$file"
@@ -48,11 +48,11 @@ jobs:
           mkdir -p android/gradle
           echo "android.suppressUnsupportedCompileSdk=34" >> android/gradle.properties
 
-      - name: Setup Java 17
+      - name: Force Java 8 Compatibility (Lowest supported for modern Android SDKs)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '8'
 
       - name: Build APK
         run: |
