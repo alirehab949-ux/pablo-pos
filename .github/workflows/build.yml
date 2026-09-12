@@ -23,14 +23,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Prepare Web Directory
+        run: |
+          mkdir -p www
+          if [ -f index.html ]; then cp index.html www/; fi
+
       - name: Install Capacitor & Dependencies
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor-community/bluetooth-le
+          npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: Add Android Platform
+      - name: Initialize Capacitor Android & Sync
         run: |
           npx cap add android
+          npx cap sync android
 
       - name: Build APK (Debug)
         run: |
