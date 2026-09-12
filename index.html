@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
   <title>Pablo Escobare | لوحة تحكم الأدمن والمدير الذكية</title>
   <style>
@@ -14,7 +14,7 @@
       --red-glow: rgba(255, 30, 56, 0.45);
       --gold-main: #f5c518;
       --gold-glow: rgba(245, 197, 24, 0.35);
-      --green-main: hsla(0, 0%, 100%, 1);
+      --green-main: #00d2b4;
       --green-glow: rgba(0, 210, 180, 0.35);
       --white-main: #ffffff;
       --text-gray: #8f96a3;
@@ -133,8 +133,8 @@
     }
 
     .btn-open {
-      background: rgba(0, 2, 210, 0.39);
-      border-color: rgba(0, 54, 210, 0.5);
+      background: rgba(0, 210, 180, 0.15);
+      border-color: rgba(0, 210, 180, 0.4);
       color: var(--green-main);
       padding-right: 16px;
       padding-left: 42px;
@@ -292,22 +292,72 @@
       padding: 12px; width: 100%; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 16px;
     }
 
-    /* Print */
-    #receipt-print-area { display: none; }
-    @media print {
-      body * { visibility: hidden; }
-      #receipt-print-area, #receipt-print-area * { visibility: visible; }
-      #receipt-print-area {
-        display: block !important; position: absolute; left: 0; top: 0; width: 80mm; padding: 10px;
-        color: #000; background: #fff; font-family: monospace; font-size: 11px; text-align: right; direction: rtl;
-      }
-      #receipt-print-area h2 { font-size: 15px; text-align: center; margin-bottom: 4px; }
-      #receipt-print-area p { text-align: center; margin-bottom: 6px; font-size: 10px; }
-      #receipt-print-area table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-      #receipt-print-area th, #receipt-print-area td { text-align: right; padding: 4px 0; font-size: 10px; border-bottom: 1px dotted #ccc; }
-      #receipt-print-area td.num { text-align: left; }
-      .receipt-divider { border-top: 1px dashed #000; margin: 8px 0; }
-      .receipt-total { display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 6px; }
+    /* Custom Glassmorphism Dialog Modal (Alerts & Confirms) */
+    #custom-dialog-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 5, 7, 0.82);
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      z-index: 4000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .custom-dialog-card {
+      background: linear-gradient(160deg, rgba(22, 22, 32, 0.95) 0%, rgba(12, 12, 18, 0.98) 100%);
+      border: 1px solid var(--border-highlight);
+      border-radius: 24px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px var(--red-glow);
+      text-align: center;
+      animation: dialogPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+    .custom-dialog-card::before {
+      content: "";
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 120px;
+      background: var(--red-main);
+      filter: blur(50px);
+      border-radius: 50%;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    @keyframes dialogPop {
+      from { opacity: 0; transform: scale(0.82) translateY(15px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .dialog-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--gold-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-shadow: 0 0 15px var(--gold-glow);
+    }
+    .dialog-body {
+      font-size: 0.95rem;
+      color: #e0e0e0;
+      margin-bottom: 24px;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+    .dialog-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
     }
 
     @media (max-width: 950px) {
@@ -548,31 +598,16 @@
     </div>
   </div>
 
-  <!-- Receipt Print Template (Fallback) -->
-  <div id="receipt-print-area">
-    <h2>PABLO ESCOBARE</h2>
-    <p>مطعم وتوصيل وجبات سريعة</p>
-    <div class="receipt-divider"></div>
-    <div style="font-size:10px;" id="receipt-time"></div>
-    <div style="font-size:10px;">النوع: طلب محلي (حضوري)</div>
-    <div class="receipt-divider"></div>
-    <table>
-      <thead>
-        <tr>
-          <th>الصنف</th>
-          <th class="num">السعر</th>
-        </tr>
-      </thead>
-      <tbody id="receipt-items-body"></tbody>
-    </table>
-    <div class="receipt-divider"></div>
-    <div class="receipt-total">
-      <span>المجموع الإجمالي:</span>
-      <span id="receipt-total-val"></span>
+  <!-- Custom Dialog Modal (Replaces browser Alert/Confirm) -->
+  <div id="custom-dialog-modal">
+    <div class="custom-dialog-card">
+      <div id="custom-dialog-title" class="dialog-title">🔔 تنبيه</div>
+      <div id="custom-dialog-body" class="dialog-body">نص التنبيه يظهر هنا...</div>
+      <div id="custom-dialog-actions" class="dialog-actions"></div>
     </div>
-    <div class="receipt-divider"></div>
-    <p style="margin-top:8px;">شكراً لزيارتكم ونتمنى لكم شهية طيبة! 🍔</p>
   </div>
+
+</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -604,6 +639,86 @@
     let bluetoothDevice = null;
     let bluetoothCharacteristic = null;
 
+    // --- نظام التنبيهات المخصص Glassmorphic Custom Dialogs (بديل Alert & Confirm) ---
+    window.showCustomAlert = function(message, title = "تنبيه 🔔") {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('custom-dialog-modal');
+        const titleEl = document.getElementById('custom-dialog-title');
+        const bodyEl = document.getElementById('custom-dialog-body');
+        const actionsEl = document.getElementById('custom-dialog-actions');
+
+        titleEl.innerHTML = title;
+        bodyEl.innerHTML = message;
+        actionsEl.innerHTML = `
+          <button id="dialog-ok-btn" class="btn-action-gold" style="padding: 10px 28px; width: 140px;">موافق</button>
+        `;
+
+        modal.style.display = 'flex';
+
+        document.getElementById('dialog-ok-btn').onclick = () => {
+          modal.style.display = 'none';
+          resolve(true);
+        };
+      });
+    };
+
+    window.showCustomConfirm = function(message, title = "تأكيد العملية ⚠️") {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('custom-dialog-modal');
+        const titleEl = document.getElementById('custom-dialog-title');
+        const bodyEl = document.getElementById('custom-dialog-body');
+        const actionsEl = document.getElementById('custom-dialog-actions');
+
+        titleEl.innerHTML = title;
+        bodyEl.innerHTML = message;
+        actionsEl.innerHTML = `
+          <button id="dialog-confirm-yes" class="btn-action-primary" style="padding: 10px 20px; flex: 1;">نعم، استمر</button>
+          <button id="dialog-confirm-no" class="btn-close-modal" style="margin-top: 0; padding: 10px 20px; flex: 1;">إلغاء</button>
+        `;
+
+        modal.style.display = 'flex';
+
+        document.getElementById('dialog-confirm-yes').onclick = () => {
+          modal.style.display = 'none';
+          resolve(true);
+        };
+
+        document.getElementById('dialog-confirm-no').onclick = () => {
+          modal.style.display = 'none';
+          resolve(false);
+        };
+      });
+    };
+
+    function getCustomerGpsUrl(ord) {
+      if (!ord) return null;
+
+      if (typeof ord.gps === 'string' && ord.gps.startsWith('http')) {
+        return ord.gps;
+      }
+
+      if (typeof ord.gps === 'string' && ord.gps.includes(',')) {
+        const [lat, lng] = ord.gps.split(',').map(s => s.trim());
+        if (lat && lng && lat !== "Non spécifié") return `https://www.google.com/maps?q=${lat},${lng}`;
+      }
+
+      if (ord.gps && typeof ord.gps === 'object') {
+        const lat = ord.gps.lat || ord.gps.latitude;
+        const lng = ord.gps.lng || ord.gps.longitude;
+        if (lat && lng && lat !== "Non spécifié") {
+          return `https://www.google.com/maps?q=${lat},${lng}`;
+        }
+      }
+
+      const directLat = ord.lat || ord.latitude;
+      const directLng = ord.lng || ord.longitude;
+      if (directLat && directLng) {
+        return `https://www.google.com/maps?q=${directLat},${directLng}`;
+      }
+
+      return null;
+    }
+
     // --- نظام ربط وطباعة البلوتوث الحرارية ESC/POS (80mm) ---
     window.connectBluetoothPrinter = async function() {
       try {
@@ -627,16 +742,16 @@
         }
 
         if (bluetoothCharacteristic) {
-          btn.innerText = "✅ متصل بـ: " + bluetoothDevice.name;
+          btn.innerText = "✅ متصل بـ: " + (bluetoothDevice.name || "الطابعة");
           btn.style.color = "var(--green-main)";
         } else {
-          alert("تعذر العثور على خاصية كتابة للطباعة في هذا الجهاز.");
-          btn.innerText = "📲 ربط طابعة البلوتوث";
+          await window.showCustomAlert("تعذر العثور على خاصية كتابة للطباعة في هذا الجهاز.", "خطأ في الطابعة ⚠️");
+          btn.innerText = "📲 Bluetooth";
         }
       } catch (error) {
         console.error("Bluetooth connection error:", error);
-        alert("لم يتم الاتصال بالطابعة: " + error.message);
-        document.getElementById('bt-connect-btn').innerText = "📲 ربط طابعة البلوتوث";
+        await window.showCustomAlert("لم يتم الاتصال بالطابعة: " + error.message, "فشل الاتصال ❌");
+        document.getElementById('bt-connect-btn').innerText = "📲 Bluetooth";
       }
     };
 
@@ -658,7 +773,7 @@
         receiptText += "------------------------------------------------\n";
 
         cartData.forEach(item => {
-          const subText = item.subItems ? ` (${formatSubItems(item.subItems)})` : '';
+          const subText = item.subItems ? ` (${window.formatSubItems(item.subItems)})` : '';
           receiptText += `${item.name}${subText}\n`;
           receiptText += `                         ${item.price} DA\n`;
         });
@@ -674,7 +789,7 @@
 
         const data = encoder.encode(receiptText);
         
-        // Chunk write for bluetooth buffers
+        // Split data into chunks to avoid Bluetooth buffer overflows
         const chunkSize = 100;
         for (let i = 0; i < data.length; i += chunkSize) {
           const chunk = data.slice(i, i + chunkSize);
@@ -682,7 +797,7 @@
         }
         return true;
       } catch (err) {
-        console.error("Direct BT print failed, switching to standard print dialog:", err);
+        console.error("Direct BT print failed:", err);
         return false;
       }
     }
@@ -744,11 +859,11 @@
     onSnapshot(collection(db, "menu"), (snapshot) => {
       menuItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       renderAdminMenuList(menuItems);
-      renderPosGrid();
+      window.renderPosGrid();
       populateExpenseDrinkDropdown();
       renderStockList();
-      renderNewPackCheckboxes();
-      renderEditPackCheckboxes();
+      window.renderNewPackCheckboxes();
+      window.renderEditPackCheckboxes();
     });
 
     window.formatSubItems = function(subItems) {
@@ -822,7 +937,7 @@
       const type = document.getElementById('new-type').value;
       const container = document.getElementById('new-pack-container');
       container.style.display = (type === 'pack') ? 'block' : 'none';
-      if (type === 'pack') renderNewPackCheckboxes();
+      if (type === 'pack') window.renderNewPackCheckboxes();
     };
 
     window.toggleEditPackSelector = function() {
@@ -874,6 +989,7 @@
 
     function renderAdminMenuList(items) {
       const container = document.getElementById('admin-menu-list');
+      if(!container) return;
       if(items.length === 0) {
         container.innerHTML = `<div style="color:var(--text-gray); font-size:0.85rem; text-align:center; padding:15px;">لا توجد عناصر.</div>`;
         return;
@@ -882,7 +998,7 @@
         const stockQty = item.stock !== undefined ? item.stock : 0;
         const costPrice = item.costPrice !== undefined ? item.costPrice : 0;
         const subItemsStr = (item.type === 'pack' && item.subItems && item.subItems.length > 0) 
-          ? `<div style="font-size:0.75rem; color:var(--gold-main); margin-top:3px;">المكونات: ${formatSubItems(item.subItems)}</div>` 
+          ? `<div style="font-size:0.75rem; color:var(--gold-main); margin-top:3px;">المكونات: ${window.formatSubItems(item.subItems)}</div>` 
           : '';
 
         return `
@@ -908,11 +1024,12 @@
       currentPosCat = cat;
       document.querySelectorAll('.pos-cat-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      renderPosGrid();
+      window.renderPosGrid();
     };
 
     window.renderPosGrid = function() {
       const grid = document.getElementById('pos-grid');
+      if(!grid) return;
       const searchQuery = document.getElementById('pos-search-input')?.value.trim().toLowerCase() || '';
       
       let filtered = menuItems.filter(i => {
@@ -932,7 +1049,7 @@
 
       grid.innerHTML = filtered.map(item => {
         const subItemsHtml = (item.type === 'pack' && item.subItems && item.subItems.length > 0)
-          ? `<div style="font-size:0.72rem; color:var(--gold-main); margin-top:4px; line-height:1.2;">📦 ${formatSubItems(item.subItems)}</div>`
+          ? `<div style="font-size:0.72rem; color:var(--gold-main); margin-top:4px; line-height:1.2;">📦 ${window.formatSubItems(item.subItems)}</div>`
           : '';
 
         let stockHtml = '';
@@ -978,7 +1095,8 @@
       const totalEl = document.getElementById('pos-total');
       const total = posCart.reduce((sum, i) => sum + Number(i.price), 0);
 
-      totalEl.innerText = total + " د.ج";
+      if(totalEl) totalEl.innerText = total + " د.ج";
+      if(!list) return;
 
       if(posCart.length === 0) {
         list.innerHTML = `<div style="text-align:center; color:var(--text-gray); padding: 25px 0;">السلة فارغة</div>`;
@@ -986,7 +1104,7 @@
       }
 
       list.innerHTML = posCart.map((item, index) => {
-        const subStr = (item.type === 'pack' && item.subItems) ? `<div style="font-size:0.72rem; color:var(--gold-main);">${formatSubItems(item.subItems)}</div>` : '';
+        const subStr = (item.type === 'pack' && item.subItems) ? `<div style="font-size:0.72rem; color:var(--gold-main);">${window.formatSubItems(item.subItems)}</div>` : '';
         return `
           <div class="pos-cart-item">
             <div>
@@ -1000,7 +1118,6 @@
       }).join('');
     }
 
-    // --- تحديث الخصم فائق السرعة عبر Batch Write دفعة واحدة ---
     async function deductStockForItems(items) {
       if(!items || !Array.isArray(items)) return;
       
@@ -1041,16 +1158,24 @@
       }
     }
 
-    // --- تأكيد وتثبيت الطلب الحضوري ومنع التكرار ---
+    // --- تأكيد وتثبيت الطلب الحضوري (مع التنبيهات المخصصة) ---
     window.confirmAndPrintPos = async function() {
-      if (isSubmittingPos) return; // قفل للتأكد من عدم الإرسال المزدوج
-      if(posCart.length === 0) { alert("الرجاء إضافة عناصر للطلب أولاً !"); return; }
+      if (isSubmittingPos) return;
+
+      if (!bluetoothCharacteristic) {
+        await window.showCustomAlert("يرجى ربط طابعة البلوتوث أولاً عن طريق زر (📲 Bluetooth) أعلى الشاشة!", "تنبيه البلوتوث 📲");
+      }
+
+      if(posCart.length === 0) { 
+        await window.showCustomAlert("الرجاء إضافة عناصر للطلب أولاً !", "السلة فارغة 🛒"); 
+        return; 
+      }
 
       const btn = document.getElementById('pos-confirm-btn');
       isSubmittingPos = true;
       if (btn) {
         btn.disabled = true;
-        btn.innerText = "جاري التأكيد والخصم... ⏳";
+        btn.innerText = "جاري التأكيد... ⏳";
       }
 
       try {
@@ -1072,26 +1197,23 @@
           createdAt: serverTimestamp()
         });
 
-        // 3. طباعة الوصل عبر البلوتوث المباشر أولاً، أو العادية في حال عدم الربط
-        const printedBT = await printToBluetoothThermal(posCart, total, fullDateStr);
-        if (!printedBT) {
-          document.getElementById('receipt-time').innerText = `التاريخ والوقت: ${fullDateStr}`;
-          document.getElementById('receipt-total-val').innerText = `${total} د.ج`;
-          document.getElementById('receipt-items-body').innerHTML = posCart.map(item => `
-            <tr>
-              <td>${item.name} ${item.subItems ? '<br><small>(' + formatSubItems(item.subItems) + ')</small>' : ''}</td>
-              <td class="num">${item.price} د.ج</td>
-            </tr>
-          `).join('');
+        // 3. المحاولة للطباعة إذا كانت الطابعة متصلة، أو التنبيه بتسجيل الطلب
+        let printedBT = false;
+        if (bluetoothCharacteristic) {
+          printedBT = await printToBluetoothThermal(posCart, total, fullDateStr);
+        } else {
+          await window.showCustomAlert("تم تسجيل الطلب وخصم المخزون بنجاح! ⚠️ <br><br>(لم يتم الطباعة لعدم اتصال طابعة البلوتوث)", "تم التسجيل بنجاح ✅");
+        }
 
-          window.print();
+        if (bluetoothCharacteristic && !printedBT) {
+          await window.showCustomAlert("تم تسجيل الطلب، لكن تعذرت الطباعة! يرجى التحقق من الطابعة.", "تنبيه الطباعة 🖨️");
         }
 
         posCart = [];
         renderPosCart();
       } catch (error) {
         console.error("Error during POS confirmation:", error);
-        alert("حدث خطأ أثناء حفظ الطلبية، يرجى المحاولة ثانية.");
+        await window.showCustomAlert("حدث خطأ أثناء حفظ الطلبية، يرجى المحاولة ثانية.", "خطأ ❌");
       } finally {
         isSubmittingPos = false;
         if (btn) {
@@ -1130,7 +1252,7 @@
         const unitPrice = Number(document.getElementById('expense-drink-unit-price').value);
 
         if(!drinkId || !qty || qty <= 0 || !unitPrice || unitPrice <= 0) {
-          alert("يرجى اختيار المشروب وتحديد الكمية وثمن الوحدة الواحدة بشكل صحيح.");
+          await window.showCustomAlert("يرجى اختيار المشروب وتحديد الكمية وثمن الوحدة الواحدة بشكل صحيح.", "بيانات ناقصة ⚠️");
           return;
         }
 
@@ -1156,7 +1278,7 @@
         const totalPrice = Number(document.getElementById('expense-gen-price').value);
 
         if(!name || !totalPrice || totalPrice <= 0) {
-          alert("يرجى إدخال اسم الشيء والمبلغ الإجمالي للشراء.");
+          await window.showCustomAlert("يرجى إدخال اسم الشيء والمبلغ الإجمالي للشراء.", "بيانات ناقصة ⚠️");
           return;
         }
 
@@ -1183,6 +1305,7 @@
       const purchaseDocs = snapshot.docs.filter(docSnap => docSnap.data().category !== 'sale_deduction');
       document.getElementById('stat-expenses').innerText = totalExpensesRecorded + " د.ج";
 
+      if (!container) return;
       if (purchaseDocs.length === 0) {
         container.innerHTML = `<div style="text-align:center; color:var(--text-gray); padding:20px;">لا توجد مشتريات مسجلة.</div>`;
         return;
@@ -1222,7 +1345,8 @@
     });
 
     window.deleteExpense = async function(id) {
-      if(confirm("هل تريد حذف هذا العنصر من سجل المصاريف والأرشيف؟")) {
+      const confirmed = await window.showCustomConfirm("هل تريد حذف هذا العنصر من سجل المصاريف والأرشيف؟", "حذف مصروف 🗑️");
+      if(confirmed) {
         await deleteDoc(doc(db, "expenses", id));
       }
     };
@@ -1253,7 +1377,7 @@
         activeOrdersMap.set(id, ord);
 
         const status = ord.status || 'En attente';
-        const gpsLink = (ord.gps && ord.gps.lat !== "Non spécifié") ? `https://maps.google.com/?q=${ord.gps.lat},${ord.gps.lng}` : '#';
+        const gpsUrl = getCustomerGpsUrl(ord);
 
         if (ord.createdAt) {
           const orderDate = ord.createdAt.toDate ? ord.createdAt.toDate().toDateString() : new Date().toDateString();
@@ -1277,7 +1401,7 @@
                 <li style="margin-bottom:4px; display:flex; justify-content:space-between; align-items:flex-start;">
                   <div>
                     <span>• ${i.name}</span>
-                    ${i.subItems ? `<div style="font-size:0.72rem; color:var(--gold-main); margin-right:8px;">📦 (${formatSubItems(i.subItems)})</div>` : ''}
+                    ${i.subItems ? `<div style="font-size:0.72rem; color:var(--gold-main); margin-right:8px;">📦 (${window.formatSubItems(i.subItems)})</div>` : ''}
                   </div>
                   <strong style="color:var(--gold-main);">${i.price} د.ج</strong>
                 </li>
@@ -1285,8 +1409,14 @@
             </ul>
 
             ${ord.phone !== "طلب محلي (حضوري)" ? `
-              <div style="margin-bottom:8px; background:var(--bg-main); padding:4px 8px; border-radius:6px; border:1px solid var(--border-light);">
-                <a href="${gpsLink}" target="_blank" style="color:var(--gold-main); font-size:0.75rem; text-decoration:none; font-weight:700;">📍 موقع الزبون (GPS)</a>
+              <div style="margin-bottom:8px; background:var(--bg-main); padding:6px 10px; border-radius:8px; border:1px solid var(--border-light); text-align:center;">
+                ${gpsUrl ? `
+                  <a href="${gpsUrl}" target="_blank" rel="noopener noreferrer" style="color:var(--gold-main); font-size:0.8rem; text-decoration:none; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
+                    📍 فتح موقع الزبون في الخريطة (GPS)
+                  </a>
+                ` : `
+                  <span style="color:var(--text-gray); font-size:0.75rem;">⚠️ لم يتم تحديد الموقع</span>
+                `}
               </div>
             ` : ''}
 
@@ -1329,7 +1459,7 @@
                 <span style="font-size:0.72rem; color:var(--text-gray);">📅 ${dateFormatted}</span>
               </div>
               <div style="font-size:0.8rem; color:#ccc; margin-bottom:6px;">
-                ${itemsList.map(i => `${i.name}${i.subItems ? ' ('+formatSubItems(i.subItems)+')' : ''} (${i.price} د.ج)`).join(' ، ')}
+                ${itemsList.map(i => `${i.name}${i.subItems ? ' ('+window.formatSubItems(i.subItems)+')' : ''} (${i.price} د.ج)`).join(' ، ')}
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:0.75rem; color:var(--green-main); font-weight:700;">حالة: ${ord.status}</span>
@@ -1340,10 +1470,10 @@
         }
       });
 
-      pendingContainer.innerHTML = pendingHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات جديدة.</div>`;
-      cookingContainer.innerHTML = cookingHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات قيد التحضير.</div>`;
-      deliveryContainer.innerHTML = deliveryHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات في الطريق.</div>`;
-      salesContainer.innerHTML = completedSalesHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px;">لا توجد مبيعات مسجلة بعد.</div>`;
+      if (pendingContainer) pendingContainer.innerHTML = pendingHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات جديدة.</div>`;
+      if (cookingContainer) cookingContainer.innerHTML = cookingHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات قيد التحضير.</div>`;
+      if (deliveryContainer) deliveryContainer.innerHTML = deliveryHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px; font-size:0.85rem;">لا توجد طلبات في الطريق.</div>`;
+      if (salesContainer) salesContainer.innerHTML = completedSalesHtml || `<div style="text-align:center; color:var(--text-gray); padding:25px;">لا توجد مبيعات مسجلة بعد.</div>`;
 
       document.getElementById('count-pending').innerText = pCount;
       document.getElementById('count-cooking').innerText = cCount;
@@ -1366,16 +1496,20 @@
     };
 
     window.deleteOrder = async function(id) {
-      if(confirm("هل أنت متأكد من حذف هذه الطلبية؟")) {
+      const confirmed = await window.showCustomConfirm("هل أنت متأكد من حذف هذه الطلبية؟", "حذف الطلب 🗑️");
+      if(confirmed) {
         await deleteDoc(doc(db, "orders", id));
       }
     };
 
     window.openSettingsModal = function() {
       document.getElementById('settings-modal').style.display = 'flex';
-      renderNewPackCheckboxes();
+      window.renderNewPackCheckboxes();
     };
-    window.closeSettingsModal = function() { document.getElementById('settings-modal').style.display = 'none'; };
+    
+    window.closeSettingsModal = function() { 
+      document.getElementById('settings-modal').style.display = 'none'; 
+    };
 
     window.openEditModal = function(id) {
       const item = menuItems.find(i => i.id === id);
@@ -1391,16 +1525,18 @@
       const packContainer = document.getElementById('edit-pack-container');
       if (item.type === 'pack') {
         packContainer.style.display = 'block';
-        renderEditPackCheckboxes(item.subItems || []);
+        window.renderEditPackCheckboxes(item.subItems || []);
       } else {
         packContainer.style.display = 'none';
-        renderEditPackCheckboxes([]);
+        window.renderEditPackCheckboxes([]);
       }
 
       document.getElementById('edit-modal').style.display = 'flex';
     };
 
-    window.closeEditModal = function() { document.getElementById('edit-modal').style.display = 'none'; };
+    window.closeEditModal = function() { 
+      document.getElementById('edit-modal').style.display = 'none'; 
+    };
 
     window.saveEditedItem = async function() {
       const id = document.getElementById('edit-id').value;
@@ -1423,7 +1559,11 @@
         });
       }
 
-      if(!name || !price) return;
+      if(!name || !price) {
+        await window.showCustomAlert("يرجى إدخال اسم العنصر وسعر البيع.", "تنبيه ⚠️");
+        return;
+      }
+
       await updateDoc(doc(db, "menu", id), {
         name, 
         price: Number(price), 
@@ -1433,11 +1573,12 @@
         subItems,
         badge: type === 'pack' ? 'PACK VIP' : (type === 'drink' ? 'مشروب' : 'وجبة')
       });
-      closeEditModal();
+      window.closeEditModal();
     };
 
     window.deleteMenuItem = async function(itemId) {
-      if(confirm("هل أنت متأكد من حذف هذا العنصر؟")) {
+      const confirmed = await window.showCustomConfirm("هل أنت متأكد من حذف هذا العنصر من القائمة؟", "حذف عنصر 🗑️");
+      if(confirmed) {
         await deleteDoc(doc(db, "menu", itemId));
       }
     };
@@ -1462,7 +1603,11 @@
         });
       }
 
-      if(!name || !price) return;
+      if(!name || !price) {
+        await window.showCustomAlert("يرجى إدخال اسم العنصر وسعر البيع على الأقل.", "تنبيه ⚠️");
+        return;
+      }
+
       await addDoc(collection(db, "menu"), {
         name, 
         price: Number(price), 
@@ -1478,7 +1623,8 @@
       document.getElementById('new-cost').value = '0';
       document.getElementById('new-stock').value = '0';
       document.getElementById('new-type').value = 'food';
-      document.getElementById('new-pack-container').style.display = 'none';
+      window.toggleNewPackSelector();
+      window.closeSettingsModal();
     };
   </script>
 </body>
