@@ -59,11 +59,11 @@ jobs:
           cd android
           ./gradlew wrapper --gradle-version 8.2
 
-      - name: Build APK (Debug)
+      - name: Clean Gradle Cache & Build APK
         run: |
           cd android
+          rm -rf ~/.gradle/caches/
           chmod +x gradlew
-          ./gradlew clean
           ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
