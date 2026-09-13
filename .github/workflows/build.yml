@@ -32,7 +32,7 @@ jobs:
         run: |
           npm init -y
           npm install @capacitor/core@5 @capacitor/cli@5 @capacitor/android@5 --legacy-peer-deps
-          npm install @capacitor-community/bluetooth-le --legacy-peer-deps
+          npm install @capacitor-community/bluetooth-le@5.0.0 --legacy-peer-deps
 
       - name: Initialize Capacitor Android & Sync
         run: |
@@ -47,11 +47,10 @@ jobs:
           sed -i 's/compileSdk = 33/compileSdk = 34/g' app/build.gradle || true
           sed -i 's/targetSdk = 33/targetSdk = 34/g' app/build.gradle || true
 
-      - name: Fix Dex and Kotlin Compatibility Issues
+      - name: Enable MultiDex
         run: |
           cd android/app
           sed -i '/defaultConfig {/a \        multiDexEnabled true' build.gradle
-          sed -i '/compileOptions {/,/}/c \    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }' build.gradle
           cd ..
 
       - name: Use Stable Gradle 8.5
