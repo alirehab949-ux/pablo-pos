@@ -54,10 +54,10 @@ jobs:
           sed -i '/compileOptions {/,/}/c \    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }' build.gradle
           cd ..
 
-      - name: Use Stable Gradle 8.2
+      - name: Use Stable Gradle 8.5
         run: |
           cd android
-          ./gradlew wrapper --gradle-version 8.2
+          ./gradlew wrapper --gradle-version 8.5
 
       - name: Clean Gradle Cache & Build APK
         run: |
