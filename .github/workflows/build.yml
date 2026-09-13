@@ -35,12 +35,11 @@ jobs:
       - name: Add Bluetooth permissions
         run: |
           FILE="android/app/src/main/AndroidManifest.xml"
-          sed -i '/<manifest/a\
-    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>\
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>\
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation"/>\
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>\
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"/>' "$FILE"
+          sed -i '/<manifest/a <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"\/>' "$FILE"
+          sed -i '/<manifest/a <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"\/>' "$FILE"
+          sed -i '/<manifest/a <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation"\/>' "$FILE"
+          sed -i '/<manifest/a <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"\/>' "$FILE"
+          sed -i '/<manifest/a <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"\/>' "$FILE"
 
       - name: Sync Capacitor
         run: npx cap sync android
