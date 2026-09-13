@@ -39,18 +39,30 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Upgrade SDK to 34 & Fix Kotlin Version
+      - name: Upgrade SDK to 34 & Override Kotlin Version
         run: |
           cd android
           sed -i 's/compileSdkVersion = 33/compileSdkVersion = 34/g' variables.gradle || true
           sed -i 's/targetSdkVersion = 33/targetSdkVersion = 34/g' variables.gradle || true
           sed -i 's/compileSdk = 33/compileSdk = 34/g' app/build.gradle || true
           sed -i 's/targetSdk = 33/targetSdk = 34/g' app/build.gradle || true
-          
-          # Force a stable Kotlin version compatible with Dex
-          if grep -q "ext {" variables.gradle; then
-            sed -i '/ext {/a \    kotlinVersion = "1.8.22"' variables.gradle
+
+          # Force override kotlin version in root build.gradle if it exists
+          if [ -f build.gradle ]; then
+            sed -i 's/kotlin_version = .*/kotlin_version = "1.8.22"/g' build.gradle || true
           fi
+
+          # Add resolution strategy to force kotlin-stdlib version and avoid dex crash
+          cat << 'EOF' >> app/build.gradle
+
+          configurations.all {
+              resolutionStrategy.eachDependency { details ->
+                  if (details.requested.group == 'org.jetbrains.kotlin') {
+                      details.useVersion '1.8.22'
+                  }
+              }
+          }
+          EOF
 
       - name: Enable MultiDex
         run: |
