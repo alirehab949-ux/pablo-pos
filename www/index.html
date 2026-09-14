@@ -41,6 +41,116 @@
       background-attachment: fixed;
     }
 
+    /* ====== شاشة القفل ====== */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 40%, #1a0508 0%, #050507 70%);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .lock-card {
+      background: linear-gradient(160deg, rgba(22, 22, 32, 0.9) 0%, rgba(12, 12, 18, 0.95) 100%);
+      border: 1px solid var(--border-highlight);
+      border-radius: 26px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px var(--red-glow);
+      position: relative;
+      overflow: hidden;
+    }
+    .lock-card::before {
+      content: "";
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 160px;
+      background: var(--red-main);
+      filter: blur(70px);
+      opacity: 0.45;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .lock-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 20px var(--red-glow));
+    }
+    .lock-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+    .lock-title span { color: var(--red-main); text-shadow: 0 0 25px var(--red-glow); }
+    .lock-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-gray);
+      margin-bottom: 28px;
+    }
+    .lock-input {
+      width: 100%;
+      padding: 16px;
+      text-align: center;
+      font-size: 1.3rem;
+      letter-spacing: 8px;
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      color: var(--gold-main);
+      outline: none;
+      margin-bottom: 16px;
+      transition: var(--transition-smooth);
+    }
+    .lock-input:focus {
+      border-color: var(--red-main);
+      box-shadow: 0 0 20px var(--red-glow);
+    }
+    .lock-btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ff416c, var(--red-main));
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px var(--red-glow);
+      transition: var(--transition-smooth);
+    }
+    .lock-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px var(--red-glow); }
+    .lock-btn:active { transform: scale(0.97); }
+
+    .lock-error {
+      color: var(--red-main);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 12px;
+      min-height: 20px;
+      animation: shake 0.4s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+    
+    .shake-anim { animation: shake 0.4s; }
+
     /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -174,6 +284,22 @@
       white-space: nowrap;
     }
     .settings-gear:hover { color: #fff; border-color: var(--gold-main); background: rgba(245, 197, 24, 0.08); }
+
+    .logout-btn {
+      background: rgba(255, 30, 56, 0.08);
+      border: 1px solid rgba(255, 30, 56, 0.3);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--red-main);
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+    }
+    .logout-btn:hover { background: rgba(255, 30, 56, 0.2); border-color: var(--red-main); }
 
     /* Dashboard Stats */
     .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
@@ -385,6 +511,30 @@
   </style>
 </head>
 <body>
+
+<!-- ================= شاشة القفل (كلمة السر) ================= -->
+<div id="lock-screen">
+  <div class="lock-card" id="lock-card">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title"><span>BL</span>AZE</div>
+    <div class="lock-subtitle">لوحة تحكم الأدمن - الرجاء إدخال كلمة السر</div>
+    
+    <input 
+      type="password" 
+      id="password-input" 
+      class="lock-input" 
+      placeholder="••••" 
+      maxlength="20"
+      autocomplete="off"
+      onkeydown="if(event.key === 'Enter') checkPassword()"
+    >
+    
+    <button class="lock-btn" onclick="checkPassword()">🔓 دخول</button>
+    
+    <div class="lock-error" id="lock-error"></div>
+  </div>
+</div>
+
 <div class="main-container">
 
   <!-- Header -->
@@ -396,6 +546,7 @@
       <button id="bt-connect-btn" class="settings-gear" onclick="connectBluetoothPrinter()">📲 Bluetooth</button>
       <button id="shop-toggle-btn" class="toggle-shop-btn btn-open" onclick="toggleShopStatus()">OUVERT</button>
       <span class="settings-gear" onclick="openSettingsModal()" title="إدارة القائمة والخدمات">⚙️</span>
+      <button class="logout-btn" onclick="logoutApp()" title="تسجيل الخروج">🚪 خروج</button>
     </div>
   </header>
 
@@ -627,6 +778,51 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // ========== كلمة السر ==========
+    const CORRECT_PASSWORD = "1234"; // <-- غيّر كلمة السر من هنا
+    let isAuthenticated = false;
+
+    window.checkPassword = function() {
+      const input = document.getElementById('password-input');
+      const errorEl = document.getElementById('lock-error');
+      const card = document.getElementById('lock-card');
+      const entered = input.value;
+
+      if (entered === CORRECT_PASSWORD) {
+        isAuthenticated = true;
+        document.getElementById('lock-screen').style.display = 'none';
+        sessionStorage.setItem('blaze_auth', 'true');
+        errorEl.innerText = '';
+        input.value = '';
+      } else {
+        errorEl.innerText = '❌ كلمة السر غير صحيحة، حاول مرة أخرى.';
+        input.value = '';
+        card.classList.remove('shake-anim');
+        void card.offsetWidth;
+        card.classList.add('shake-anim');
+      }
+    };
+
+    window.logoutApp = function() {
+      isAuthenticated = false;
+      sessionStorage.removeItem('blaze_auth');
+      document.getElementById('lock-screen').style.display = 'flex';
+      document.getElementById('password-input').value = '';
+      document.getElementById('lock-error').innerText = '';
+    };
+
+    // التحقق من الجلسة عند فتح الصفحة
+    document.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('blaze_auth') === 'true') {
+        isAuthenticated = true;
+        document.getElementById('lock-screen').style.display = 'none';
+      } else {
+        document.getElementById('lock-screen').style.display = 'flex';
+        setTimeout(() => document.getElementById('password-input').focus(), 300);
+      }
+    });
+
+    // ========== متغيرات عامة ==========
     let isShopOpen = true;
     let previousOrdersCount = null;
     let menuItems = [];
