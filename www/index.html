@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
-  <title>Pablo Escobare | لوحة تحكم الأدمن والمدير الذكية</title>
+  <title>BLAZE | لوحة تحكم الأدمن والمدير الذكية</title>
   <style>
     :root {
       --bg-main: #050507;
@@ -50,7 +50,7 @@
     /* Header & Frame */
     .pablo-police-frame {
       position: relative;
-      background: rgba(20, 20, 28, 0.45); 
+      background: rgba(20, 20, 28, 0.65); 
       backdrop-filter: blur(24px) saturate(120%); 
       -webkit-backdrop-filter: blur(24px) saturate(120%);
       border-radius: 20px;
@@ -79,8 +79,8 @@
       transform: translate(-50%, -50%);
     }
 
-    .pablo-police-frame::before { background: #ff0000; animation: swimRed 9s infinite ease-in-out alternate; }
-    .pablo-police-frame::after { background: #0011ff; animation: swimBlue 8s infinite ease-in-out alternate; }
+    .pablo-police-frame::before { background: #303030; animation: swimRed 9s infinite ease-in-out alternate; }
+    .pablo-police-frame::after { background: #FFF200; animation: swimBlue 8s infinite ease-in-out alternate; }
 
     @keyframes swimRed {
       0%   { left: 10%; top: 20%; }
@@ -245,7 +245,7 @@
       border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer;
       transition: var(--transition-smooth); display: flex; justify-content: center; align-items: center;
     }
-    .btn-action-primary { background: linear-gradient(135deg, #ff416c, var(--red-main)); color: #fff; box-shadow: 0 6px 20px var(--red-glow); }
+.btn-action-primary { background: linear-gradient(135deg, #ff416c, var(--red-main)); color: #fff; box-shadow: 0 6px 20px var(--red-glow); }
     .btn-action-gold { background: linear-gradient(135deg, var(--gold-main), #d49800); color: #000; box-shadow: 0 6px 20px var(--gold-glow); }
     .btn-action-gold:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -389,7 +389,9 @@
 
   <!-- Header -->
   <header class="pablo-police-frame">
-    <div class="logo">PABLO <span>ESCOBARE </span></div>
+   <div class="logo"><span style="color: var(--gold-main); text-shadow: 0 0 25px var(--gold-glow);">BL</span>AZE</div>
+
+
     <div class="admin-bar">
       <button id="bt-connect-btn" class="settings-gear" onclick="connectBluetoothPrinter()">📲 Bluetooth</button>
       <button id="shop-toggle-btn" class="toggle-shop-btn btn-open" onclick="toggleShopStatus()">OUVERT</button>
@@ -549,8 +551,8 @@
         <h4 style="margin-bottom:12px; font-size:0.95rem; color:var(--gold-main);">+ إضافة عنصر جديد للقائمة</h4>
         <input type="text" id="new-name" class="modal-input" placeholder="اسم العنصر أو اسم الـ Pack">
         <input type="number" id="new-price" class="modal-input" placeholder="سعر البيع للزبون (د.ج)">
-        <input type="number" id="new-cost" class="modal-input" placeholder="ثمن الشراء للوحدة (خاص بالمشروبات) (د.ج)" value="0">
-        <input type="number" id="new-stock" class="modal-input" placeholder="الكمية الابتدائية (خاص بالمشروبات)" value="0">
+        <input type="number" id="new-cost" class="modal-input" placeholder="ثمن الشراء للوحدة (خاص بالمشروبات) (د.ج)" value="">
+        <input type="number" id="new-stock" class="modal-input" placeholder="الكمية الابتدائية (خاص بالمشروبات)" value="">
         
         <select id="new-type" class="modal-input" onchange="toggleNewPackSelector()">
           <option value="food">وجبة عادية</option>
@@ -805,7 +807,7 @@
       let receiptText = "\x1B\x40"; // ESC @ Reset Printer
       receiptText += "\x1B\x61\x01"; // ESC a 1 (Center Align)
       receiptText += "\x1D\x21\x11"; // Double size text
-      receiptText += "PABLO ESCOBARE\n";
+      receiptText += "BLAZE\n";
       receiptText += "\x1D\x21\x00"; // Normal size
       receiptText += "Restaurant & Fast Food\n";
       receiptText += "------------------------------------------------\n";
@@ -1109,12 +1111,53 @@
     };
 
     window.addToPosCartById = function(id) {
-      const item = menuItems.find(i => i.id === id);
-      if(item) {
-        posCart.push({ ...item });
-        renderPosCart();
+  const item = menuItems.find(i => i.id === id);
+  if (!item) return;
+  
+  // حساب الكمية المستخدمة حاليا في السلة لأي مشروب (مباشر أو داخل Pack)
+  function getUsedQtyInCart(drinkName) {
+    let used = 0;
+    posCart.forEach(c => {
+      if (c.type === 'drink' && c.name.trim() === drinkName.trim()) {
+        used += 1;
       }
-    };
+      if (c.type === 'pack' && Array.isArray(c.subItems)) {
+        c.subItems.forEach(s => {
+          const sName = typeof s === 'object' ? s.name : s;
+          const sQty = typeof s === 'object' ? (s.qty || 1) : 1;
+          if (sName.trim() === drinkName.trim()) used += sQty;
+        });
+      }
+    });
+    return used;
+  }
+  
+  if (item.type === 'drink') {
+    const stockQty = Number(item.stock || 0);
+    const used = getUsedQtyInCart(item.name);
+    if (used + 1 > stockQty) {
+      window.showCustomAlert(`الكمية المتوفرة من "${item.name}" في المخزون هي ${stockQty} فقط، ولا يمكن إضافة المزيد!`, "نفاد المخزون ⚠️");
+      return;
+    }
+  } else if (item.type === 'pack' && Array.isArray(item.subItems)) {
+    for (const sub of item.subItems) {
+      const subName = typeof sub === 'object' ? sub.name : sub;
+      const subQty = typeof sub === 'object' ? (sub.qty || 1) : 1;
+      const subMenuItem = menuItems.find(m => m.type === 'drink' && m.name.trim() === subName.trim());
+      if (subMenuItem) {
+        const stockQty = Number(subMenuItem.stock || 0);
+        const used = getUsedQtyInCart(subMenuItem.name);
+        if (used + subQty > stockQty) {
+          window.showCustomAlert(`الكمية المتوفرة من "${subMenuItem.name}" غير كافية لإضافة هذا الـ Pack (المتوفر: ${stockQty})!`, "نفاد المخزون ⚠️");
+          return;
+        }
+      }
+    }
+  }
+  
+  posCart.push({ ...item });
+  renderPosCart();
+};
 
     window.removeFromPosCart = function(index) {
       posCart.splice(index, 1);
